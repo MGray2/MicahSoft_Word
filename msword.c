@@ -2,8 +2,6 @@
 # include <string.h>
 # include <ctype.h>
 # include <errno.h>
-# include <unistd.h>
-# include <unistd.h>
 
 # include "include/menu.c"
 
@@ -13,6 +11,7 @@
 # else // for UNIX users (mac and linux)
 # include <sys/stat.h>
 # include <sys/types.h>
+# include <unistd.h>
 # endif
 
 
@@ -38,6 +37,8 @@ int main() {
     int response = title_selection();
     switch (response) {
         case 0:
+        new_file_screen();
+        case 1:
         break;
         case 5:
         break;
