@@ -1,7 +1,8 @@
-# include "menu.h"
+# include "../headers/menu.h"
 # include <ctype.h>
 # include <stdio.h>
 # include <string.h>
+# include <stdbool.h>
 
 #ifdef _WIN32 // for Windows users
 #include <windows.h>
@@ -9,11 +10,23 @@
 #include <dirent.h>
 #endif
 
-static void clear_screen(void) {
+bool yes_no_response() {
+    char response;
+    do {
+    response = getchar();
+    } while (tolower(response) != 'y' && tolower(response) != 'n');
+    if (tolower(response) == 'y') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void clear_screen(void) {
     printf("\x1b[2J"); // Simply clears the screen
 }
 
-static void title_screen(void) {
+void title_screen(void) {
     printf(" \n");
     printf("\x1b[44m                                              \x1b[0m\n");
     printf("\x1b[44m         \x1b[0m       MicahSoft Word       \x1b[44m         \x1b[0m\n");
@@ -27,7 +40,7 @@ static void title_screen(void) {
     printf("\x1b[44m                                              \x1b[0m\n");
 }
 
-static int title_selection(void) {
+int title_selection(void) {
     char response; 
     // translator for title action
     do {
@@ -56,8 +69,9 @@ static int title_selection(void) {
     }
 }
 
+void file_constructor(char folder_name[], char file_name[]);
 
-static void new_file_screen(void) {
+void new_file_screen(void) {
     char file_name[100];
     char folder_path[100];
     clear_screen();
@@ -67,9 +81,9 @@ static void new_file_screen(void) {
     strcpy(folder_path, "mscache");
 
     #ifdef _WIN32
-    strcat(folder_path, "\\*");
+    strcat(folder_path, "\\");
     #else
-    strcat(folder_path, "/*");
+    strcat(folder_path, "/");
     #endif
 
     clear_screen();
@@ -96,7 +110,7 @@ static void new_file_screen(void) {
     if (file_found) {
         printf("File '%s' already exists in the directory.\n", file_name);
     } else {
-        printf("File '%s' does not exist in the directory.\n", file_name);
+        file_constructor(folder_path, file_name);
     }
     // For Unix
     #else 
@@ -113,9 +127,14 @@ static void new_file_screen(void) {
         closedir(dir);
 
         if (file_found) {
-            printf("File '%s' already exists in the directory.\n", file_name);
+            printf("File '%s' already exists in the directory. Rename? Y/N. \n", file_name);
+            if (yes_no_response()) {
+                new_file_screen();
+                // recurse
+            }
+
         } else {
-            printf("File '%s' does not exist in the directory.\n", file_name);
+            file_constructor(folder_path, file_name);
         }
     } else {
         printf("Error opening directory: %s\n", folder_path);
@@ -124,3 +143,12 @@ static void new_file_screen(void) {
     #endif
 }
 
+void file_constructor(char folder_name[], char file_name[]) {
+    if (file_name[strlen(file_name) - 1] == '\n') {
+            file_name[strlen(file_name) - 1] = '\0'; // replace carriage return with null terminator
+            }
+            char full_path_name[200];
+            sprintf(full_path_name, "%s%s", folder_name, file_name); // construct path with folder/filename
+            FILE *file = fopen(full_path_name, "w");
+            fclose(file);
+}

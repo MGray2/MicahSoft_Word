@@ -3,7 +3,7 @@
 # include <ctype.h>
 # include <errno.h>
 
-# include "include/menu.c"
+# include "headers/menu.h"
 
 # ifdef _WIN32 // for Windows users
 # include <direct.h>
@@ -37,6 +37,7 @@ int main() {
     int response = title_selection();
     switch (response) {
         case 0:
+        // New File
         new_file_screen();
         case 1:
         break;
