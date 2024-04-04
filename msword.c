@@ -27,10 +27,8 @@ int main() {
 }
     if (mkdir(directory, 0777) == 0) {
         printf("\x1b[32mDirectory created. Your documents will be located in '%s'.\x1b[0m", directory);
-        sleep(1);
     } else {
         perror("\x1b[31mCannot create directory\x1b[0m");
-        sleep(1);
     }
 
 

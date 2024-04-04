@@ -2,7 +2,7 @@
 # include <ctype.h>
 # include <stdio.h>
 # include <string.h>
-# include <stdbool.h>
+
 
 #ifdef _WIN32 // for Windows users
 #include <windows.h>
@@ -10,15 +10,26 @@
 #include <dirent.h>
 #endif
 
-bool yes_no_response() {
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void remove_newline(char *str) {
+    if (str[strlen(str) - 1] == '\n') {
+        str[strlen(str) - 1] = '\0'; 
+    }
+}
+
+int yes_no_response() {
     char response;
     do {
     response = getchar();
     } while (tolower(response) != 'y' && tolower(response) != 'n');
     if (tolower(response) == 'y') {
-        return true;
+        return 1;
     } else {
-        return false;
+        return 0;
     }
 }
 
@@ -75,20 +86,17 @@ void new_file_screen(void) {
     char file_name[100];
     char folder_path[100];
     clear_screen();
-    printf("New file name: ");
+    clear_input_buffer();
+    printf("New file name: "); 
     fgets(file_name, sizeof(file_name), stdin);
-
+    remove_newline(file_name);
     strcpy(folder_path, "mscache");
-
+    
     #ifdef _WIN32
     strcat(folder_path, "\\");
     #else
     strcat(folder_path, "/");
     #endif
-
-    clear_screen();
-    printf("New file name: ");
-    fgets(file_name, sizeof(file_name), stdin);
 
     // For Windows
     #ifdef _WIN32 
@@ -108,18 +116,32 @@ void new_file_screen(void) {
     FindClose(hFind);
 
     if (file_found) {
-        printf("File '%s' already exists in the directory.\n", file_name);
+        printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
+            if (yes_no_response()) {
+                new_file_screen();
+                // recurse
+            } else {
+                char new_file_name[120];  
+                strcpy(new_file_name, "CopyOf");
+                strcat(new_file_name, file_name);
+                file_constructor(folder_path, new_file_name);
+            }
+        
     } else {
+        // create the file
         file_constructor(folder_path, file_name);
     }
     // For Unix
     #else 
+    
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(folder_path)) != NULL) {
         int file_found = 0;
         while ((ent = readdir(dir)) != NULL) {
+            printf("%s\n", ent->d_name); // show files
             if (strcmp(ent->d_name, file_name) == 0) {
+                printf("\x1b[31m%s\x1b[0m\n", ent->d_name); // red highlight for duplicate
                 file_found = 1;
                 break;
             }
@@ -127,16 +149,23 @@ void new_file_screen(void) {
         closedir(dir);
 
         if (file_found) {
-            printf("File '%s' already exists in the directory. Rename? Y/N. \n", file_name);
+            printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
             if (yes_no_response()) {
                 new_file_screen();
                 // recurse
+            } else {
+                char new_file_name[120];  
+                strcpy(new_file_name, "CopyOf");
+                strcat(new_file_name, file_name);
+                file_constructor(folder_path, new_file_name);
             }
 
         } else {
+            // create the file
             file_constructor(folder_path, file_name);
         }
     } else {
+        // if the folder could not be found
         printf("Error opening directory: %s\n", folder_path);
         return;
     }
@@ -144,11 +173,9 @@ void new_file_screen(void) {
 }
 
 void file_constructor(char folder_name[], char file_name[]) {
-    if (file_name[strlen(file_name) - 1] == '\n') {
-            file_name[strlen(file_name) - 1] = '\0'; // replace carriage return with null terminator
-            }
-            char full_path_name[200];
-            sprintf(full_path_name, "%s%s", folder_name, file_name); // construct path with folder/filename
-            FILE *file = fopen(full_path_name, "w");
-            fclose(file);
+    remove_newline(file_name);
+    char full_path_name[200];
+    sprintf(full_path_name, "%s%s", folder_name, file_name); // construct path as "folder/filename"
+    FILE *file = fopen(full_path_name, "w");
+    fclose(file);
 }
