@@ -38,7 +38,14 @@ int main() {
         // New File
         new_file_screen();
         case 1:
-        break;
+        // Find Existing File
+        file_find_screen();
+        case 2:
+        copy_file_screen();
+        case 3:
+        // Delete File
+        case 4:
+        // Information
         case 5:
         break;
         default:

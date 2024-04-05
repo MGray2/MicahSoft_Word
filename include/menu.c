@@ -179,3 +179,105 @@ void file_constructor(char folder_name[], char file_name[]) {
     FILE *file = fopen(full_path_name, "w");
     fclose(file);
 }
+
+void file_find_screen(void) {
+    char file_name[100];
+    char folder_path[100];
+    clear_screen();
+    clear_input_buffer();
+    printf("File name: "); 
+    // come back later
+}
+
+// arg1 = source file, arg2 = new file
+void copy_file(const char *src_file, const char *dest_file);
+
+void copy_file_screen(void) {
+    char file_name[100];
+    char folder_path[100];
+    clear_screen();
+    clear_input_buffer();
+    strcpy(folder_path, "mscache");
+
+    #ifdef _WIN32
+    strcat(folder_path, "\\*"); // Append * to the folder path to list all files
+    WIN32_FIND_DATA find_file_data;
+    HANDLE hFind = FindFirstFile(folder_path, &find_file_data); 
+    if (hFind == INVALID_HANDLE_VALUE) {
+        printf("Error opening directory: %s\n", folder_path);
+        return; 
+    }
+    int file_found = 0;
+    do {
+        printf("%s\n", find_file_data.cFileName); // Print each file name
+        
+    } while (FindNextFile(hFind, &find_file_data) != 0);
+    FindClose(hFind);
+    #else
+    // For Unix
+    strcat(folder_path, "/");
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(folder_path)) != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            printf("%s\n", ent->d_name); // show files for reference
+        }
+        closedir(dir);
+    #endif
+    }
+    printf("File name: "); 
+    fgets(file_name, sizeof(file_name), stdin);
+    remove_newline(file_name);
+
+    if ((dir = opendir(folder_path)) != NULL) {
+        int file_found = 0;
+        while ((ent = readdir(dir)) != NULL) {
+            if (strcmp(ent->d_name, file_name) == 0) {
+                file_found = 1;
+                break;
+            }
+        }
+        closedir(dir);
+        if (file_found) {
+            // copy the file
+            char dest_file[120];
+            strcpy(dest_file, "CopyOf");
+            strcat(dest_file, file_name);
+            file_constructor(folder_path, dest_file);
+            printf("Copying into '%s'.\n", dest_file);
+            copy_file(file_name, dest_file);
+        } else {
+            // couldnt copy the file
+            printf("File not found. Try again? Y/N ");
+            if (yes_no_response()) {
+                copy_file_screen();
+                // recurse
+            } else {
+                return;
+            }
+        }
+    }
+    
+}
+
+void copy_file(const char *src_filename, const char *dest_filename) {
+    FILE *src_file = fopen(src_filename, "rb"); // read from
+    if (src_file == NULL) {
+        printf("Could not open '%s'. ", src_filename);
+        return;
+    }
+    FILE *dest_file = fopen(dest_filename, "wb"); // write to
+    if (dest_file == NULL) {
+        printf("Could not open '%s'. ", dest_filename);
+        fclose(src_file);  // Close the source file before returning
+        return;
+    }
+    char buffer[1024];
+    size_t bytes_read;
+    while ((bytes_read = fread(buffer, 1, sizeof(buffer), src_file)) > 0) {
+        fwrite(buffer, 1, bytes_read, dest_file);
+    }
+
+    fclose(src_file);
+    fclose(dest_file);
+}
