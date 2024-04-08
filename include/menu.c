@@ -10,17 +10,20 @@
 #include <dirent.h>
 #endif
 
+// consumes the input line
 void clear_input_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+// processes newline out of input
 void remove_newline(char *str) {
     if (str[strlen(str) - 1] == '\n') {
         str[strlen(str) - 1] = '\0'; 
     }
 }
 
+// returns true if response is y or Y, false otherwise.
 int yes_no_response() {
     char response;
     do {
@@ -33,8 +36,9 @@ int yes_no_response() {
     }
 }
 
+// Simply clears the screen
 void clear_screen(void) {
-    printf("\x1b[2J"); // Simply clears the screen
+    printf("\x1b[2J"); 
 }
 
 void title_screen(void) {
@@ -177,7 +181,11 @@ void file_constructor(char folder_name[], char file_name[]) {
     char full_path_name[200];
     sprintf(full_path_name, "%s%s", folder_name, file_name); // construct path as "folder/filename"
     FILE *file = fopen(full_path_name, "w");
+    if (file == NULL) {
+    perror("Error creating file");
     fclose(file);
+    return;
+    }
 }
 
 void file_find_screen(void) {
@@ -244,8 +252,17 @@ void copy_file_screen(void) {
             strcpy(dest_file, "CopyOf");
             strcat(dest_file, file_name);
             file_constructor(folder_path, dest_file);
+            // convert file name to path
+            char dest_full[120];
+            strcpy(dest_full, folder_path);
+            strcat(dest_full, dest_file);
+            
+            char src_full[120];
+            strcpy(src_full, folder_path);
+            strcat(src_full, file_name);
+
             printf("Copying into '%s'.\n", dest_file);
-            copy_file(file_name, dest_file);
+            copy_file(src_full, dest_full);
         } else {
             // couldnt copy the file
             printf("File not found. Try again? Y/N ");
@@ -261,15 +278,16 @@ void copy_file_screen(void) {
 }
 
 void copy_file(const char *src_filename, const char *dest_filename) {
+    printf("**DEBUG** copy_file(%s, %s)", src_filename, dest_filename);
     FILE *src_file = fopen(src_filename, "rb"); // read from
     if (src_file == NULL) {
-        printf("Could not open '%s'. ", src_filename);
+        perror("Could not open file");
         return;
     }
     FILE *dest_file = fopen(dest_filename, "wb"); // write to
     if (dest_file == NULL) {
-        printf("Could not open '%s'. ", dest_filename);
-        fclose(src_file);  // Close the source file before returning
+        perror("Could not open file");
+        fclose(src_file);  
         return;
     }
     char buffer[1024];
