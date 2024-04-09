@@ -90,6 +90,7 @@ void new_file_screen(void) {
     char file_name[100];
     char folder_path[100];
     clear_screen();
+    printf("\x1b[44m              New File              \x1b[0m\n");
     clear_input_buffer();
     printf("New file name: "); 
     fgets(file_name, sizeof(file_name), stdin);
@@ -159,7 +160,7 @@ void new_file_screen(void) {
                 // recurse
             } else {
                 char new_file_name[120];  
-                strcpy(new_file_name, "CopyOf");
+                strcpy(new_file_name, "duplicate_");
                 strcat(new_file_name, file_name);
                 file_constructor(folder_path, new_file_name);
             }
@@ -193,8 +194,26 @@ void file_find_screen(void) {
     char folder_path[100];
     clear_screen();
     clear_input_buffer();
+    printf("\x1b[44m             Locate File              \x1b[0m\n");
+    strcpy(folder_path, "mscache");
+    
+    #ifdef _WIN32
+    // windows code goes here
+    #else
+    strcat(folder_path, "/");
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(folder_path)) != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            printf("%s\n", ent->d_name); 
+        }
+        closedir(dir);
+    }
+
+    #endif
     printf("File name: "); 
-    // come back later
+    fgets(file_name, sizeof(file_name), stdin);
+
 }
 
 // arg1 = source file, arg2 = new file
@@ -205,6 +224,7 @@ void copy_file_screen(void) {
     char folder_path[100];
     clear_screen();
     clear_input_buffer();
+    printf("\x1b[44m             Copy File              \x1b[0m\n");
     strcpy(folder_path, "mscache");
 
     #ifdef _WIN32
@@ -221,6 +241,7 @@ void copy_file_screen(void) {
         
     } while (FindNextFile(hFind, &find_file_data) != 0);
     FindClose(hFind);
+
     #else
     // For Unix
     strcat(folder_path, "/");
@@ -278,7 +299,6 @@ void copy_file_screen(void) {
 }
 
 void copy_file(const char *src_filename, const char *dest_filename) {
-    printf("**DEBUG** copy_file(%s, %s)", src_filename, dest_filename);
     FILE *src_file = fopen(src_filename, "rb"); // read from
     if (src_file == NULL) {
         perror("Could not open file");
