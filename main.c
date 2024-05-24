@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <errno.h>
 
-#include "headers/menu.h"
+#include "include/menu.h"
 
 #ifdef _WIN32 // for Windows users
 #include <direct.h>
