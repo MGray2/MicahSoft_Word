@@ -1,9 +1,7 @@
 #ifndef MENU_H_
+// Set of functions for displaying menus and gathering responses.
 #define MENU_H_
 
-int yes_no_response(void);
-void remove_newline(char *str);
-void clear_screen(void);
 void title_screen(void);
 int title_selection(void);
 void new_file_screen(void);

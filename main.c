@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 #include <errno.h>
-
 #include "include/menu.h"
+#include "include/tools.h"
 
 #ifdef _WIN32 // for Windows users
 #include <direct.h>
 #define mkdir(path, mode) _mkdir(path)
+
 #else // for UNIX users (mac and linux)
 #include <sys/stat.h>
 #include <sys/types.h>
