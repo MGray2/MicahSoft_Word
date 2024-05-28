@@ -109,8 +109,7 @@ void new_file_screen(void)
         }
         else
         {
-            char new_file_name[120];
-            strcpy(new_file_name, "CopyOf");
+            char new_file_name[] = "CopyOf";
             strcat(new_file_name, file_name);
             file_constructor(folder_path, new_file_name);
         }
@@ -151,7 +150,7 @@ void new_file_screen(void)
             else
             {
                 char new_file_name[120];
-                strcpy(new_file_name, "duplicate_");
+                strcpy(new_file_name, "CopyOf");
                 strcat(new_file_name, file_name);
                 file_constructor(folder_path, new_file_name);
             }
@@ -172,6 +171,7 @@ void new_file_screen(void)
 #endif
 }
 
+// Screen for locating existing files. Returns string of file path.
 char *file_find_screen(void)
 {
     char file_name[100];
@@ -301,8 +301,7 @@ void copy_file_screen(void)
             if (file_found)
             {
                 // copy the file
-                char dest_file[120];
-                strcpy(dest_file, "CopyOf");
+                char dest_file[] = "CopyOf";
                 strcat(dest_file, file_name);
                 file_constructor(folder_path, dest_file);
                 // convert file name to path
