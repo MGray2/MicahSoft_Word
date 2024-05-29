@@ -6,10 +6,10 @@ void clear_input_buffer(void);
 void remove_newline(char *str);
 int yes_no_response(void);
 void clear_screen(void);
-void print_debug(char *message, int line, ...);
-void print_red(char *message);
-void print_grn(char *message);
-void print_blu(char *message);
-void print_ylw(char *message);
+void print_debug(char *message, char *file, int line, ...);
+void print_red(char *message, ...);
+void print_grn(char *message, ...);
+void print_blu(char *message, ...);
+void print_ylw(char *message, ...);
 
 #endif

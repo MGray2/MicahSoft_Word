@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "menu.h"
 #include "tools.h"
-#include "caction.h"
+#include "saction.h"
 
 #ifdef _WIN32 // for Windows users
 #include <windows.h>
@@ -12,7 +12,7 @@
 #include <dirent.h>
 #endif
 
-// Title screen art
+// Title screen art. (menu.h)
 void title_screen(void)
 {
     printf(" \n");
@@ -28,7 +28,7 @@ void title_screen(void)
     printf("\x1b[44m                                              \x1b[0m\n");
 }
 
-// Controller for title input
+// Controller for title input. (menu.h)
 int title_selection(void)
 {
     char response;
@@ -60,7 +60,7 @@ int title_selection(void)
     }
 }
 
-// Screen for creating a new file
+// Menu interface for creating a new file. (menu.h)
 void new_file_screen(void)
 {
     char file_name[100];
@@ -81,25 +81,7 @@ void new_file_screen(void)
 
 // For Windows
 #ifdef _WIN32
-    WIN32_FIND_DATA find_file_data;
-    HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
-    if (hFind == INVALID_HANDLE_VALUE)
-    {
-        printf("Error opening directory: %s\n", folder_path);
-        return;
-    }
-    int file_found = 0;
-    do
-    {
-        if (strcmp(find_file_data.cFileName, file_name) == 0)
-        {
-            file_found = 1;
-            break;
-        }
-    } while (FindNextFile(hFind, &find_file_data) != 0);
-    FindClose(hFind);
-
-    if (file_found)
+    if (file_search_WIN32(folder_path, file_name))
     {
         printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
         if (yes_no_response())
@@ -109,8 +91,10 @@ void new_file_screen(void)
         }
         else
         {
-            char new_file_name[] = "CopyOf";
+            char new_file_name[200];
+            strcpy(new_file_name, "CopyOf");
             strcat(new_file_name, file_name);
+            print_debug(folder_path, __FILE__, __LINE__, new_file_name, NULL);
             file_constructor(folder_path, new_file_name);
         }
     }
@@ -121,57 +105,38 @@ void new_file_screen(void)
     }
 // For Unix
 #else
-
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(folder_path)) != NULL)
+    if (file_search_UNIX(folder_path, file_name))
     {
-        int file_found = 0;
-        while ((ent = readdir(dir)) != NULL)
+        printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
+        if (yes_no_response())
         {
-            printf("%s\n", ent->d_name); // show files
-            if (strcmp(ent->d_name, file_name) == 0)
-            {
-                printf("\x1b[31m%s\x1b[0m\n", ent->d_name); // red highlight for duplicate
-                file_found = 1;
-                break;
-            }
-        }
-        closedir(dir);
-
-        if (file_found)
-        {
-            printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
-            if (yes_no_response())
-            {
-                new_file_screen();
-                // recurse
-            }
-            else
-            {
-                char new_file_name[120];
-                strcpy(new_file_name, "CopyOf");
-                strcat(new_file_name, file_name);
-                file_constructor(folder_path, new_file_name);
-            }
+            new_file_screen();
+            // recurse
         }
         else
         {
-            // create the file
-            file_constructor(folder_path, file_name);
-            return;
+            char new_file_name[120];
+            strcpy(new_file_name, "CopyOf");
+            strcat(new_file_name, file_name);
+            file_constructor(folder_path, new_file_name);
         }
     }
     else
     {
-        // if the folder could not be found
-        printf("Error opening directory: %s\n", folder_path);
+        // create the file
+        file_constructor(folder_path, file_name);
         return;
     }
+}
+else
+{
+    // if the folder could not be found
+    print_red("Error opening directory", folder_path, NULL);
+    return;
 #endif
 }
 
-// Screen for locating existing files. Returns string of file path.
+// Screen for locating existing files. Returns string of file path. (menu.h)
 char *file_find_screen(void)
 {
     char file_name[100];
@@ -243,6 +208,7 @@ char *file_find_screen(void)
 #endif
 }
 
+// Menu interface for selecting file to copy. (menu.h)
 void copy_file_screen(void)
 {
     char file_name[100];

@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include "tools.h"
 
-// Consumes the input line
+// Consumes the input line for future use. (tools.h)
 void clear_input_buffer()
 {
     int c;
@@ -12,7 +12,7 @@ void clear_input_buffer()
         ;
 }
 
-// Processes newline out of input
+// Processes the newline out of the string. (tools.h)
 void remove_newline(char *str)
 {
     if (str[strlen(str) - 1] == '\n')
@@ -21,7 +21,7 @@ void remove_newline(char *str)
     }
 }
 
-// Returns true if response is 'y' or 'Y', false otherwise.
+// Returns true if response is 'y' or 'Y', false otherwise. (tools.h)
 int yes_no_response()
 {
     char response;
@@ -39,21 +39,23 @@ int yes_no_response()
     }
 }
 
-// Simply clears the screen
+// Simply clears the screen. (tools.h)
 void clear_screen(void)
 {
     printf("\x1b[2J");
 }
 
-// Prints message suitable for debug purposes, use '__LINE__' for line argument.
-// Additional arguments must be string, you must add 'NULL' at the end of the parameters.
-void print_debug(char *message, int line, ...)
+/* Prints message suitable for debug purposes,
+use '__FILE__' for file argument.
+use '__LINE__' for line argument.
+Additional arguments must be string, you must add 'NULL' at the end of the parameters. (tools.h) */
+void print_debug(char *message, char *file, int line, ...)
 {
     va_list args;
     va_start(args, line);
 
     char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "***DEBUG*** (ln: %d) %s", line, message);
+    snprintf(buffer, sizeof(buffer), "***DEBUG*** (%s ln:%d) %s", file, line, message);
 
     const char *arg;
     while ((arg = va_arg(args, const char *)) != NULL)
@@ -67,26 +69,82 @@ void print_debug(char *message, int line, ...)
     printf("\x1b[35m%s\x1b[0m\n", buffer);
 }
 
-// prints red text
-void print_red(char *message)
+// Prints terminal red text, additional arguments must be string and end with NULL. (tools.h)
+void print_red(char *message, ...)
 {
-    printf("\x1b[31m %s \x1b[0m\n", message);
+    va_list args;
+    va_start(args, message);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s", message);
+
+    const char *arg;
+    while ((arg = va_arg(args, const char *)) != NULL)
+    {
+        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
+        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
+    }
+    va_end(args);
+
+    printf("\x1b[31m%s\x1b[0m\n", buffer);
 }
 
-// prints green text
-void print_grn(char *message)
+// Prints terminal green text, additional arguments must be string and end with NULL. (tools.h)
+void print_grn(char *message, ...)
 {
-    printf("\x1b[32m %s \x1b[0m\n", message);
+    va_list args;
+    va_start(args, message);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s", message);
+
+    const char *arg;
+    while ((arg = va_arg(args, const char *)) != NULL)
+    {
+        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
+        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
+    }
+    va_end(args);
+
+    printf("\x1b[32m%s\x1b[0m\n", buffer);
 }
 
-// prints blue text
-void print_blu(char *message)
+// Prints terminal blue text, additional arguments must be string and end with NULL. (tools.h)
+void print_blu(char *message, ...)
 {
-    printf("\x1b[34m %s \x1b[0m\n", message);
+    va_list args;
+    va_start(args, message);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s", message);
+
+    const char *arg;
+    while ((arg = va_arg(args, const char *)) != NULL)
+    {
+        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
+        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
+    }
+    va_end(args);
+
+    printf("\x1b[34m%s\x1b[0m\n", buffer);
 }
 
-// prints yellow text
-void print_ylw(char *message)
+// Prints terminal yellow text, additional arguments must be string and end with NULL. (tools.h)
+void print_ylw(char *message, ...)
 {
-    printf("\x1b[33m %s \x1b[0m\n", message);
+    va_list args;
+    va_start(args, message);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s", message);
+
+    const char *arg;
+    while ((arg = va_arg(args, const char *)) != NULL)
+    {
+        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
+        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
+    }
+    va_end(args);
+
+    printf("\x1b[33m%s\x1b[0m\n", buffer);
 }

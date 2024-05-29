@@ -30,7 +30,7 @@ int main()
     }
     if (mkdir(directory, 0777) == 0)
     {
-        printf("\x1b[32mDirectory created. Your documents will be located in '%s'.\x1b[0m", directory);
+        print_grn("Directory created. Your documents will be located in:", directory, NULL);
     }
     else
     {
@@ -46,7 +46,7 @@ int main()
         break;
     case 1:
         // Find Existing File
-        printf("\x1b[32m %s \x1b[0m", file_find_screen());
+        print_grn(file_find_screen(), NULL);
         break;
     case 2:
         copy_file_screen();
