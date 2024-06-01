@@ -4,6 +4,7 @@
 
 void clear_input_buffer(void);
 void remove_newline(char *str);
+void remove_asterisk(char *str);
 int yes_no_response(void);
 void clear_screen(void);
 void print_debug(char *message, char *file, int line, ...);

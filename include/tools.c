@@ -21,6 +21,15 @@ void remove_newline(char *str)
     }
 }
 
+// Processes the asterisk out of the string, for windows wild search pattern. (tools.h)
+void remove_asterisk(char *str)
+{
+    if (str[strlen(str) - 1] == '*')
+    {
+        str[strlen(str) - 1] = '\0';
+    }
+}
+
 // Returns true if response is 'y' or 'Y', false otherwise. (tools.h)
 int yes_no_response()
 {

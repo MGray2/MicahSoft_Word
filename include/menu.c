@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "menu.h"
 #include "tools.h"
-#include "saction.h"
+#include "actor.h"
 
 #ifdef _WIN32 // for Windows users
 #include <windows.h>
@@ -22,7 +22,7 @@ void title_screen(void)
     printf("\x1b[44m                                              \x1b[0m\n");
     printf("\x1b[44m  \x1b[0m                                          \x1b[44m  \x1b[0m\n");
     printf("\x1b[44m  \x1b[0m       \x1b[47mn\x1b[0mew file        \x1b[47mf\x1b[0mind file          \x1b[44m  \x1b[0m\n");
-    printf("\x1b[44m  \x1b[0m       \x1b[47mc\x1b[0mopy file       \x1b[47md\x1b[0melete file        \x1b[44m  \x1b[0m\n");
+    printf("\x1b[44m  \x1b[0m                                          \x1b[44m  \x1b[0m\n");
     printf("\x1b[44m  \x1b[0m       \x1b[47mi\x1b[0mnformation     \x1b[47mq\x1b[0muit               \x1b[44m  \x1b[0m\n");
     printf("\x1b[44m  \x1b[0m                                          \x1b[44m  \x1b[0m\n");
     printf("\x1b[44m                                              \x1b[0m\n");
@@ -81,7 +81,7 @@ void new_file_screen(void)
 
 // For Windows
 #ifdef _WIN32
-    if (file_search_WIN32(folder_path, file_name))
+    if (file_search(folder_path, file_name))
     {
         printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
         if (yes_no_response())
@@ -94,7 +94,6 @@ void new_file_screen(void)
             char new_file_name[200];
             strcpy(new_file_name, "CopyOf");
             strcat(new_file_name, file_name);
-            print_debug(folder_path, __FILE__, __LINE__, new_file_name, NULL);
             file_constructor(folder_path, new_file_name);
         }
     }
@@ -105,7 +104,7 @@ void new_file_screen(void)
     }
 // For Unix
 #else
-    if (file_search_UNIX(folder_path, file_name))
+    if (file_search(folder_path, file_name))
     {
         printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
         if (yes_no_response())
@@ -147,65 +146,44 @@ char *file_find_screen(void)
     strcpy(folder_path, "mscache");
 
 #ifdef _WIN32
-// windows code goes here
+    strcat(folder_path, "\\*");
+
 #else
     strcat(folder_path, "/");
-    DIR *dir;
-    struct dirent *ent;
-    // show folder contents
-    if ((dir = opendir(folder_path)) != NULL)
-    {
-        while ((ent = readdir(dir)) != NULL)
-        {
-            printf("%s\n", ent->d_name);
-        }
-        closedir(dir);
-    }
 
+#endif
+    show_files(folder_path);
     printf("File name: ");
     fgets(file_name, sizeof(file_name), stdin);
     remove_newline(file_name);
 
-    if ((dir = opendir(folder_path)) != NULL)
+    if (file_search(folder_path, file_name))
     {
-        int file_found = 0;
-        while ((ent = readdir(dir)) != NULL)
+        remove_asterisk(folder_path);
+        strcat(folder_path, file_name);
+        // preserves the value of the file name after function end
+        char *found_file = (char *)malloc(200);
+        if (found_file == NULL)
         {
-            if (strcmp(ent->d_name, file_name) == 0)
-            {
-                file_found = 1;
-                break;
-            }
+            perror("Memory Allocation Failed.");
+            exit(EXIT_FAILURE);
         }
-        closedir(dir);
-        if (file_found)
+        strcpy(found_file, folder_path);
+        clear_screen();
+        return found_file;
+    }
+    else
+    {
+        // couldnt locate the file
+        printf("File not found. Try again? Y/N ");
+        if (yes_no_response())
         {
-            strcat(folder_path, file_name);
-            // preserves the value of the file name after function end
-            char *found_file = (char *)malloc(strlen(folder_path) + 1);
-            if (found_file == NULL)
-            {
-                perror("Memory Allocation Failed.");
-                exit(EXIT_FAILURE);
-            }
-            strcat(found_file, folder_path);
-            return found_file;
-        }
-        else
-        {
-            // couldnt locate the file
-            printf("File not found. Try again? Y/N ");
-            if (yes_no_response())
-            {
-                file_find_screen();
-                // recurse
-            }
+            file_find_screen();
+            // recurse
         }
     }
     perror("EOF");
     return NULL;
-
-#endif
 }
 
 // Menu interface for selecting file to copy. (menu.h)
@@ -220,84 +198,42 @@ void copy_file_screen(void)
 
 #ifdef _WIN32
     strcat(folder_path, "\\*"); // Append * to the folder path to list all files
-    WIN32_FIND_DATA find_file_data;
-    HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
-    if (hFind == INVALID_HANDLE_VALUE)
-    {
-        printf("Error opening directory: %s\n", folder_path);
-        return;
-    }
-    int file_found = 0;
-    do
-    {
-        printf("%s\n", find_file_data.cFileName); // Print each file name
-
-    } while (FindNextFile(hFind, &find_file_data) != 0);
-    FindClose(hFind);
 
 #else
     // For Unix
     strcat(folder_path, "/");
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(folder_path)) != NULL)
-    {
-        while ((ent = readdir(dir)) != NULL)
-        {
-            printf("%s\n", ent->d_name); // show files for reference
-        }
-        closedir(dir);
-
-        printf("File name: ");
-        fgets(file_name, sizeof(file_name), stdin);
-        remove_newline(file_name);
-
-        if ((dir = opendir(folder_path)) != NULL)
-        {
-            int file_found = 0;
-            while ((ent = readdir(dir)) != NULL)
-            {
-                if (strcmp(ent->d_name, file_name) == 0)
-                {
-                    file_found = 1;
-                    break;
-                }
-            }
-            closedir(dir);
-            if (file_found)
-            {
-                // copy the file
-                char dest_file[] = "CopyOf";
-                strcat(dest_file, file_name);
-                file_constructor(folder_path, dest_file);
-                // convert file name to path
-                char dest_full[120];
-                strcpy(dest_full, folder_path);
-                strcat(dest_full, dest_file);
-
-                char src_full[120];
-                strcpy(src_full, folder_path);
-                strcat(src_full, file_name);
-
-                printf("Copying into '%s'.\n", dest_file);
-                copy_file(src_full, dest_full);
-            }
-            else
-            {
-                // couldnt copy the file
-                printf("File not found. Try again? Y/N ");
-                if (yes_no_response())
-                {
-                    copy_file_screen();
-                    // recurse
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
-    }
 
 #endif
+    if (file_search(folder_path, file_name))
+    {
+        // copy the file
+        char dest_file[] = "CopyOf";
+        strcat(dest_file, file_name);
+        file_constructor(folder_path, dest_file);
+        // convert file name to path
+        char dest_full[120];
+        strcpy(dest_full, folder_path);
+        strcat(dest_full, dest_file);
+
+        char src_full[120];
+        strcpy(src_full, folder_path);
+        strcat(src_full, file_name);
+
+        printf("Copying into '%s'.\n", dest_file);
+        copy_file(src_full, dest_full);
+    }
+    else
+    {
+        // couldnt copy the file
+        printf("File not found. Try again? Y/N ");
+        if (yes_no_response())
+        {
+            copy_file_screen();
+            // recurse
+        }
+        else
+        {
+            return;
+        }
+    }
 }

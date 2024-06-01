@@ -42,10 +42,7 @@ void file_constructor(char *folder_name, char *file_name)
 {
     remove_newline(file_name);
 #ifdef _WIN32
-    if (folder_name[strlen(folder_name) - 1] == '*')
-    {
-        folder_name[strlen(folder_name) - 1] = '\0';
-    }
+    remove_asterisk(folder_name);
 #endif
     char full_path_name[200];
     sprintf(full_path_name, "%s%s", folder_name, file_name); // construct path as "folder/filename"
@@ -60,7 +57,7 @@ void file_constructor(char *folder_name, char *file_name)
 
 /* Evaluates the folder for exact instances of file name.
 Returns true if duplicate located, false otherwise. (saction.h)*/
-int file_search_WIN32(char *folder_path, char *file_name)
+int file_search(char *folder_path, char *file_name)
 {
 #ifdef _WIN32
     WIN32_FIND_DATA find_file_data;
@@ -90,15 +87,6 @@ int file_search_WIN32(char *folder_path, char *file_name)
     {
         return 0;
     }
-#endif
-}
-
-/* Evaluates the folder for exact instances of file name.
-Returns true if duplicate located, false otherwise. (saction.h)*/
-int file_search_UNIX(char *folder_path, char *file_name)
-{
-#ifdef _WIN32
-// nothing, this is for unix
 #else
     DIR *dir;
     struct dirent *ent;
@@ -124,6 +112,38 @@ int file_search_UNIX(char *folder_path, char *file_name)
     else
     {
         return 0;
+    }
+#endif
+}
+
+// Simply displays all file names under the folder. (saction.h)
+void show_files(char *folder_path)
+{
+#ifdef _WIN32
+    WIN32_FIND_DATA find_file_data;
+    HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
+    if (hFind == INVALID_HANDLE_VALUE)
+    {
+        printf("Error opening directory: %s\n", folder_path);
+        return;
+    }
+
+    do
+    {
+        printf("%s\n", find_file_data.cFileName); // Print each file name
+
+    } while (FindNextFile(hFind, &find_file_data) != 0);
+    FindClose(hFind);
+#else
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(folder_path)) != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL)
+        {
+            printf("%s\n", ent->d_name); // show files
+        }
+        closedir(dir);
     }
 #endif
 }
