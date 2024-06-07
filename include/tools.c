@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include "tools.h"
 
 // Consumes the input line for future use. (tools.h)
@@ -156,4 +157,33 @@ void print_ylw(char *message, ...)
     va_end(args);
 
     printf("\x1b[33m%s\x1b[0m\n", buffer);
+}
+
+// Removes the substring from the given string, returns a new string. (tools.h)
+char *remove_substring(const char *str, const char *sub)
+{
+    size_t len = strlen(str);
+    size_t sub_len = strlen(sub);
+    char *result = (char *)malloc(len + 1);
+    char *p_result = result;
+
+    if (!result)
+    {
+        return NULL;
+    }
+
+    const char *p = str;
+    const char *next;
+
+    while ((next = strstr(p, sub)) != NULL)
+    {
+        // Copy characters before the substring
+        size_t num_chars = next - p;
+        strncpy(p_result, p, num_chars);
+        p_result += num_chars;
+        p = next + sub_len;
+    }
+    // Copy the remaining part of the original string
+    strcpy(p_result, p);
+    return result;
 }

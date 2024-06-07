@@ -42,20 +42,17 @@ int main()
     {
     case 0:
         // New File
-        new_file_screen();
+        file_write_screen(new_file_screen());
         break;
     case 1:
         // Find Existing File
-        print_grn(file_find_screen(), NULL);
+        file_write_screen(file_find_screen());
         break;
     case 2:
-        copy_file_screen();
+        // information
         break;
     case 3:
-    // Delete File
-    case 4:
-    // Information
-    case 5:
+        // quit the program
         break;
     default:
         break;

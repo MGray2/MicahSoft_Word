@@ -39,7 +39,7 @@ int title_selection(void)
         printf("->");
         response = getchar();
 
-    } while (response != 'n' && response != 'f' && response != 'c' && response != 'd' && response != 'i' && response != 'q');
+    } while (response != 'n' && response != 'f' && response != 'i' && response != 'q');
 
     switch (tolower(response))
     {
@@ -47,21 +47,17 @@ int title_selection(void)
         return 0;
     case 'f':
         return 1;
-    case 'c':
-        return 2;
-    case 'd':
-        return 3;
     case 'i':
-        return 4;
+        return 2;
     case 'q':
-        return 5;
+        return 3;
     default:
         return 9;
     }
 }
 
-// Menu interface for creating a new file. (menu.h)
-void new_file_screen(void)
+// Menu interface for creating a new file. Returns string of file path. (menu.h)
+char *new_file_screen(void)
 {
     char file_name[100];
     char folder_path[100];
@@ -95,12 +91,29 @@ void new_file_screen(void)
             strcpy(new_file_name, "CopyOf");
             strcat(new_file_name, file_name);
             file_constructor(folder_path, new_file_name);
+            char *p_created_file = (char *)malloc(200);
+            if (p_created_file == NULL)
+            {
+                perror("Memory Allocation Failed.");
+                exit(EXIT_FAILURE);
+            }
+            strcpy(p_created_file, new_file_name);
+            return p_created_file;
         }
     }
     else
     {
         // create the file
         file_constructor(folder_path, file_name);
+        char *p_created_file = (char *)malloc(200);
+        if (p_created_file == NULL)
+        {
+            perror("Memory Allocation Failed.");
+            exit(EXIT_FAILURE);
+        }
+        strcat(folder_path, file_name);
+        strcpy(p_created_file, folder_path);
+        return p_created_file;
     }
 // For Unix
 #else
@@ -162,15 +175,15 @@ char *file_find_screen(void)
         remove_asterisk(folder_path);
         strcat(folder_path, file_name);
         // preserves the value of the file name after function end
-        char *found_file = (char *)malloc(200);
-        if (found_file == NULL)
+        char *p_found_file = (char *)malloc(200);
+        if (p_found_file == NULL)
         {
             perror("Memory Allocation Failed.");
             exit(EXIT_FAILURE);
         }
-        strcpy(found_file, folder_path);
+        strcpy(p_found_file, folder_path);
         clear_screen();
-        return found_file;
+        return p_found_file;
     }
     else
     {
@@ -236,4 +249,17 @@ void copy_file_screen(void)
             return;
         }
     }
+}
+
+void file_write_screen(char *file_path)
+{
+    clear_screen();
+    char showpath[200];
+#ifdef _WIN32
+    strcpy(showpath, remove_substring(file_path, "mscache\\"));
+#else
+    strcpy(showpath, remove_substring(file_path, "mscache/"));
+#endif
+    printf("\x1b[44m          Now editing \x1b[3m'%s'          \x1b[0m\n", showpath);
+    print_debug("real path:", __FILE__, __LINE__, file_path, NULL);
 }
