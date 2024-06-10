@@ -251,15 +251,102 @@ void copy_file_screen(void)
     }
 }
 
+void copy_miniscreen(char *source_path, char *file_name)
+{
+    char folder[200];
+#ifdef _WIN32
+    strcpy(folder, "mscache\\*");
+#else
+    strcpy(folder, "mscache/");
+#endif
+    printf("Would you like to rename the copy? Y/N ");
+    if (yes_no_response()) // If yes
+    {
+        char copy_name[100];
+        clear_input_buffer();
+        printf("File name: ");
+        fgets(copy_name, sizeof(copy_name), stdin);
+        remove_newline(copy_name);
+        while (file_search(folder, copy_name) != 0)
+        {
+            print_ylw("Name is already in use. Try again? Y/N ", NULL);
+            if (yes_no_response())
+            {
+                copy_miniscreen(source_path, file_name);
+            }
+            else
+            {
+                char dest_file[200];
+#ifdef _WIN32
+                remove_asterisk(folder);
+#endif
+                strcpy(dest_file, folder);
+                strcat(dest_file, "CopyOf");
+                strcat(dest_file, file_name);
+                print_debug(dest_file, __FILE__, __LINE__, NULL);
+            }
+        }
+    }
+    else // If No
+    {
+        char dest_file[200];
+#ifdef _WIN32
+        remove_asterisk(folder);
+#endif
+        strcpy(dest_file, folder);
+        strcat(dest_file, "CopyOf");
+        strcat(dest_file, file_name);
+        print_debug(dest_file, __FILE__, __LINE__, NULL);
+    }
+}
+
+/* The file menu before any changes occur. Needs the full file path as an argument.
+Provides options to write, copy, read and delete target file. (menu.c) */
 void file_write_screen(char *file_path)
 {
     clear_screen();
     char showpath[200];
+    char folder[200];
 #ifdef _WIN32
-    strcpy(showpath, remove_substring(file_path, "mscache\\"));
+    strcpy(showpath, remove_substring(file_path, "mscache\\")); // file name without folder
 #else
     strcpy(showpath, remove_substring(file_path, "mscache/"));
 #endif
-    printf("\x1b[44m          Now editing \x1b[3m'%s'          \x1b[0m\n", showpath);
     print_debug("real path:", __FILE__, __LINE__, file_path, NULL);
+    printf("\x1b[44m          Now editing \x1b[3m'%s'          \x1b[0m\n", showpath);
+    printf("\n \x1b[47mw\x1b[0mrite into file    \x1b[47mr\x1b[0mead file\n\n");
+    printf(" \x1b[47mc\x1b[0mopy file          \x1b[47md\x1b[0melete file\n\n");
+    printf(" \x1b[47mm\x1b[0main menu                 \n");
+
+    printf("\n ->");
+    char response;
+    do
+    {
+        response = getchar();
+    } while (response != 'w' && response != 'c' && response != 'd' && response != 'r' && response != 'm');
+    switch (response)
+    {
+    case 'w':
+        // implement write
+        print_ylw("Write mode", NULL);
+        break;
+    case 'r':
+        // implement read
+        print_grn("Read Mode", NULL);
+        break;
+    case 'c':
+        // implement copy
+        copy_miniscreen(file_path, showpath);
+        // file_write_screen(file_path);
+        break;
+    case 'd':
+        // implement delete
+        print_red("Delete Mode", NULL);
+        break;
+    case 'm':
+        // goes back to main
+        break;
+    default:
+        break;
+    }
 }

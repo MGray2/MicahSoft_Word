@@ -49,10 +49,10 @@ int main()
         file_write_screen(file_find_screen());
         break;
     case 2:
-        // information
+        // Information
         break;
     case 3:
-        // quit the program
+        // Quit the program
         break;
     default:
         break;

@@ -10,7 +10,7 @@
 #include <dirent.h>
 #endif
 
-// Copies the first argument to the address of the second argument. (saction.h)
+// Copies the first argument to the address of the second argument. (actor.h)
 void copy_file(const char *src_filename, const char *dest_filename)
 {
     FILE *src_file = fopen(src_filename, "rb"); // read from
@@ -37,7 +37,7 @@ void copy_file(const char *src_filename, const char *dest_filename)
     fclose(dest_file);
 }
 
-// Creates files by given path arguments. (saction.h)
+// Creates files by given path arguments. (actor.h)
 void file_constructor(char *folder_name, char *file_name)
 {
     remove_newline(file_name);
@@ -56,7 +56,7 @@ void file_constructor(char *folder_name, char *file_name)
 }
 
 /* Evaluates the folder for exact instances of file name.
-Returns true if duplicate located, false otherwise. (saction.h)*/
+Returns true if duplicate located, false otherwise. (actor.h)*/
 int file_search(char *folder_path, char *file_name)
 {
 #ifdef _WIN32
@@ -116,7 +116,7 @@ int file_search(char *folder_path, char *file_name)
 #endif
 }
 
-// Simply displays all file names under the folder. (saction.h)
+// Simply displays all file names under the folder. (actor.h)
 void show_files(char *folder_path)
 {
 #ifdef _WIN32
