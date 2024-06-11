@@ -1,5 +1,6 @@
 {
-    "files.associations": {
-        "menu.h": "c"
-    }
+  "files.associations": {
+    "menu.h": "c",
+    "time.h": "c"
+  }
 }

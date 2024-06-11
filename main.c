@@ -6,6 +6,7 @@
 
 #ifdef _WIN32 // for Windows users
 #include <direct.h>
+#include <windows.h>
 #define mkdir(path, mode) _mkdir(path)
 
 #else // for UNIX users (mac and linux)
@@ -31,6 +32,11 @@ int main()
     if (mkdir(directory, 0777) == 0)
     {
         print_grn("Directory created. Your documents will be located in:", directory, NULL);
+#ifdef _WIN32
+        Sleep(3000);
+#else
+        sleep(3);
+#endif
     }
     else
     {
@@ -43,10 +49,12 @@ int main()
     case 0:
         // New File
         file_write_screen(new_file_screen());
+        main();
         break;
     case 1:
         // Find Existing File
         file_write_screen(file_find_screen());
+        main();
         break;
     case 2:
         // Information

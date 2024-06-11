@@ -187,3 +187,16 @@ char *remove_substring(const char *str, const char *sub)
     strcpy(p_result, p);
     return result;
 }
+
+/* Non-empty input, asks for input until input is at least one character.
+first arg is variable to recieve the return value, second arg is input capture size.
+This function will automatically call 'remove_newline()' on itself. (tools.h) */
+void ne_input(char *dest_str, int input_size)
+{
+    fgets(dest_str, input_size, stdin);
+    while (strlen(dest_str) < 2)
+    {
+        fgets(dest_str, input_size, stdin);
+    }
+    remove_newline(dest_str);
+}

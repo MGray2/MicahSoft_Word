@@ -10,6 +10,7 @@
 #include <windows.h>
 #else // for Unix users (macOS, Linux, etc.)
 #include <dirent.h>
+#include <unistd.h>
 #endif
 
 // Title screen art. (menu.h)
@@ -65,8 +66,7 @@ char *new_file_screen(void)
     printf("\x1b[44m              New File              \x1b[0m\n");
     clear_input_buffer();
     printf("New file name: ");
-    fgets(file_name, sizeof(file_name), stdin);
-    remove_newline(file_name);
+    ne_input(file_name, sizeof(file_name));
     strcpy(folder_path, "mscache");
 
 #ifdef _WIN32
@@ -133,8 +133,7 @@ char *file_find_screen(void)
 
     show_files(folder_path);
     printf("File name: ");
-    fgets(file_name, sizeof(file_name), stdin);
-    remove_newline(file_name);
+    ne_input(file_name, sizeof(file_name));
 
     if (file_search(folder_path, file_name))
     {
@@ -160,6 +159,10 @@ char *file_find_screen(void)
             file_find_screen();
             // recurse
         }
+        else
+        {
+            return "";
+        }
     }
     perror("EOF");
     return NULL;
@@ -180,8 +183,7 @@ void copy_miniscreen(char *source_path, char *file_name)
         char copy_name[100];
         clear_input_buffer();
         printf("File name: ");
-        fgets(copy_name, sizeof(copy_name), stdin);
-        remove_newline(copy_name);
+        ne_input(copy_name, sizeof(copy_name));
         while (1)
         {
             if (file_search(folder, copy_name)) // If duplicate name
@@ -230,12 +232,51 @@ void copy_miniscreen(char *source_path, char *file_name)
     }
 }
 
+// Private interface for file deletions
+int delete_miniscreen(char *source_file)
+{
+    char showpath[100];
+#ifdef _WIN32
+    strcpy(showpath, remove_substring(source_file, "mscache\\"));
+#else
+    strcpy(showpath, remove_substring(source_file, "mscache/"));
+#endif
+    print_red("Are you sure you want to delete", showpath, "? Y/N", NULL);
+#ifdef _WIN32
+    Sleep(2000);
+#else
+    sleep(2);
+#endif
+    printf("->");
+    if (yes_no_response())
+    {
+        if (remove(source_file) == 0)
+        {
+            print_grn("File", source_file, "was deleted successfully.", NULL);
+            return 1;
+        }
+        else
+        {
+            perror("File deletion error:");
+            return -1;
+        }
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 /* The file menu before any changes occur. Needs the full file path as an argument.
 Provides options to write, copy, read and delete target file. (menu.c) */
 void file_write_screen(char *file_path)
 {
+    if (strcmp(file_path, "") == 0)
+    {
+        return;
+    }
     clear_screen();
-    char showpath[200];
+    char showpath[100];
     char folder[200];
 #ifdef _WIN32
     strcpy(showpath, remove_substring(file_path, "mscache\\")); // file name without folder
@@ -267,11 +308,18 @@ void file_write_screen(char *file_path)
     case 'c':
         // implement copy
         copy_miniscreen(file_path, showpath);
-        file_write_screen(file_path);
+        file_write_screen(file_path); // return
     case 'd':
         // implement delete
-        print_red("Delete Mode", NULL);
-        break;
+        if (delete_miniscreen(file_path))
+        {
+            break;
+        }
+        else
+        {
+            file_write_screen(file_path);
+        }
+
     case 'm':
         // goes back to main
         break;
