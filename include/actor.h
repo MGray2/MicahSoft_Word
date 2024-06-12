@@ -6,4 +6,5 @@ void copy_file(const char *src_filename, const char *dest_filename);
 void file_constructor(char *folder_name, char *file_name);
 int file_search(char *folder_path, char *file_name);
 void show_files(char *folder_path);
+void line_reader(char *source_path);
 #endif

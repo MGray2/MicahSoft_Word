@@ -253,6 +253,8 @@ int delete_miniscreen(char *source_file)
         if (remove(source_file) == 0)
         {
             print_grn("File", source_file, "was deleted successfully.", NULL);
+            free(source_file);
+            source_file = NULL;
             return 1;
         }
         else
@@ -271,7 +273,7 @@ int delete_miniscreen(char *source_file)
 Provides options to write, copy, read and delete target file. (menu.c) */
 void file_write_screen(char *file_path)
 {
-    if (strcmp(file_path, "") == 0)
+    if (file_path == NULL)
     {
         return;
     }
@@ -302,23 +304,25 @@ void file_write_screen(char *file_path)
         print_ylw("Write mode", NULL);
         break;
     case 'r':
-        // implement read
+        // read file
         print_grn("Read Mode", NULL);
+        line_reader(file_path);
+        print_blu("\nPress enter to continue.", NULL);
+        pause_input();
+        file_write_screen(file_path); // return
         break;
     case 'c':
-        // implement copy
+        // copy file
         copy_miniscreen(file_path, showpath);
         file_write_screen(file_path); // return
+        break;
     case 'd':
-        // implement delete
-        if (delete_miniscreen(file_path))
-        {
-            break;
-        }
-        else
+        // delete file
+        if (!delete_miniscreen(file_path))
         {
             file_write_screen(file_path);
         }
+        break;
 
     case 'm':
         // goes back to main

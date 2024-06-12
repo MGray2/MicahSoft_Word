@@ -8,6 +8,7 @@
 #include <windows.h>
 #else // for Unix users (macOS, Linux, etc.)
 #include <dirent.h>
+#include <sys/types.h>
 #endif
 
 // Copies the first argument to the address of the second argument. (actor.h)
@@ -146,4 +147,46 @@ void show_files(char *folder_path)
         closedir(dir);
     }
 #endif
+}
+
+// For use in read mode, scans file path and writes line-by-line enumerated text into output. (actor.h)
+void line_reader(char *source_path)
+{
+    char *buffer = NULL;
+    size_t bufsize = 0;
+    ssize_t line_length;
+    int line_counter = 1;
+    FILE *file_obj = fopen(source_path, "r");
+    if (is_file_empty(file_obj))
+    {
+        print_ylw("File is empty.", NULL);
+        return;
+    }
+    while ((line_length = getline(&buffer, &bufsize, file_obj)) != -1)
+    {
+        if (line_length == -1)
+        {
+            if (feof(file_obj))
+            {
+                // End of file reached
+                return;
+            }
+            else
+            {
+                perror("Error reading line");
+                return;
+            }
+        }
+        // Remove the newline character
+        if (buffer[line_length - 1] == '\n')
+        {
+            buffer[line_length - 1] = '\0';
+        }
+
+        // Print the line number and the line
+        printf("%d: %s\n", line_counter, buffer);
+        line_counter++;
+    }
+    free(buffer);
+    fclose(file_obj);
 }

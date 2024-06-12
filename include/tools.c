@@ -200,3 +200,19 @@ void ne_input(char *dest_str, int input_size)
     }
     remove_newline(dest_str);
 }
+
+// Halts the program until 'enter' is pressed. (tools.h)
+void pause_input(void)
+{
+    clear_input_buffer();
+    clear_input_buffer();
+}
+
+// Returns true if file is empty, false otherwise. (tools.h)
+int is_file_empty(FILE *file)
+{
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    rewind(file);
+    return size == 0 ? 1 : 0;
+}
