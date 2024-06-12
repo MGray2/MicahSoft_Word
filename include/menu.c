@@ -153,15 +153,37 @@ char *file_find_screen(void)
     else
     {
         // couldnt locate the file
-        printf("File not found. Try again? Y/N ");
-        if (yes_no_response())
+        while (1)
         {
-            file_find_screen();
-            // recurse
-        }
-        else
-        {
-            return "";
+            printf("File not found. Try again? Y/N ");
+            if (yes_no_response())
+            {
+                printf("File name: ");
+                ne_input(file_name, sizeof(file_name));
+                if (file_search(folder_path, file_name))
+                {
+                    remove_asterisk(folder_path);
+                    strcat(folder_path, file_name);
+
+                    char *p_found_file = (char *)malloc(200);
+                    if (p_found_file == NULL)
+                    {
+                        perror("Memory Allocation Failed.");
+                        exit(EXIT_FAILURE);
+                    }
+                    strcpy(p_found_file, folder_path);
+                    clear_screen();
+                    return p_found_file;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                return NULL;
+            }
         }
     }
     perror("EOF");
@@ -259,7 +281,7 @@ int delete_miniscreen(char *source_file)
         }
         else
         {
-            perror("File deletion error:");
+            perror("File deletion error");
             return -1;
         }
     }

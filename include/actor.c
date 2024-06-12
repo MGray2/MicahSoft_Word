@@ -60,6 +60,7 @@ void file_constructor(char *folder_name, char *file_name)
 Returns true if duplicate located, false otherwise. (actor.h)*/
 int file_search(char *folder_path, char *file_name)
 {
+    int file_found = 0;
 #ifdef _WIN32
     WIN32_FIND_DATA find_file_data;
     HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
@@ -68,7 +69,6 @@ int file_search(char *folder_path, char *file_name)
         printf("Error opening directory: %s\n", folder_path);
         return 0;
     }
-    int file_found = 0;
     do
     {
         printf("%s\n", find_file_data.cFileName); // Print each file name
@@ -80,20 +80,11 @@ int file_search(char *folder_path, char *file_name)
         }
     } while (FindNextFile(hFind, &find_file_data) != 0);
     FindClose(hFind);
-    if (file_found)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
 #else
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(folder_path)) != NULL)
     {
-        int file_found = 0;
         while ((ent = readdir(dir)) != NULL)
         {
             printf("%s\n", ent->d_name); // show files
@@ -106,6 +97,7 @@ int file_search(char *folder_path, char *file_name)
         }
         closedir(dir);
     }
+#endif
     if (file_found)
     {
         return 1;
@@ -114,7 +106,6 @@ int file_search(char *folder_path, char *file_name)
     {
         return 0;
     }
-#endif
 }
 
 // Simply displays all file names under the folder. (actor.h)
