@@ -76,7 +76,7 @@ void print_debug(char *message, char *file, int line, ...)
 
     va_end(args);
 
-    printf("\x1b[35m%s\x1b[0m\n", buffer);
+    printf("\x1b[45m\x1b[30m%s\x1b[0m\n", buffer);
 }
 
 // Prints terminal red text, additional arguments must be string and end with NULL. (tools.h)
@@ -208,7 +208,7 @@ void pause_input(void)
     clear_input_buffer();
 }
 
-// Returns true if file is empty, false otherwise. (tools.h)
+// Returns true if file is empty, false otherwise. Calls 'rewind()' on file. (tools.h)
 int is_file_empty(FILE *file)
 {
     fseek(file, 0, SEEK_END);

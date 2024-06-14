@@ -153,41 +153,17 @@ char *file_find_screen(void)
     else
     {
         // couldnt locate the file
-        while (1)
+        printf("File not found. Try again? Y/N ");
+        if (yes_no_response())
         {
-            printf("File not found. Try again? Y/N ");
-            if (yes_no_response())
-            {
-                printf("File name: ");
-                ne_input(file_name, sizeof(file_name));
-                if (file_search(folder_path, file_name))
-                {
-                    remove_asterisk(folder_path);
-                    strcat(folder_path, file_name);
-
-                    char *p_found_file = (char *)malloc(200);
-                    if (p_found_file == NULL)
-                    {
-                        perror("Memory Allocation Failed.");
-                        exit(EXIT_FAILURE);
-                    }
-                    strcpy(p_found_file, folder_path);
-                    clear_screen();
-                    return p_found_file;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                return NULL;
-            }
+            file_find_screen();
+            // recurse
+        }
+        else
+        {
+            return NULL;
         }
     }
-    perror("EOF");
-    return NULL;
 }
 
 // Private interface for copying targeted file on the writer screen (menu.c)
@@ -291,6 +267,35 @@ int delete_miniscreen(char *source_file)
     }
 }
 
+void write_miniscreen(char *source_file)
+{
+    clear_screen();
+    unsigned int line_counter = line_reader(source_file);
+    if (line_counter == 0)
+    {
+        line_counter = 1;
+    }
+    FILE *file_r = fopen(source_file, "r");
+    FILE *file;
+    file = fopen(source_file, line_counter == 0 ? "w" : "a");
+    fclose(file_r);
+    char response[1024] = "";
+    clear_input_buffer();
+
+    while (1)
+    {
+        printf("\x1b[34m%d:\x1b[0m ", line_counter);
+        fgets(response, sizeof(response), stdin);
+        if (strcmp(response, "/quit\n") == 0)
+        {
+            break;
+        }
+        fwrite(response, 1, strlen(response), file);
+        line_counter++;
+    }
+    fclose(file);
+}
+
 /* The file menu before any changes occur. Needs the full file path as an argument.
 Provides options to write, copy, read and delete target file. (menu.c) */
 void file_write_screen(char *file_path)
@@ -307,11 +312,10 @@ void file_write_screen(char *file_path)
 #else
     strcpy(showpath, remove_substring(file_path, "mscache/"));
 #endif
-    print_debug("real path:", __FILE__, __LINE__, file_path, NULL);
     printf("\x1b[44m          Now editing \x1b[3m'%s'          \x1b[0m\n", showpath);
     printf("\n \x1b[47mw\x1b[0mrite into file    \x1b[47mr\x1b[0mead file\n\n");
     printf(" \x1b[47mc\x1b[0mopy file          \x1b[47md\x1b[0melete file\n\n");
-    printf(" \x1b[47mm\x1b[0main menu                 \n");
+    printf(" \x1b[47mm\x1b[0main menu          word count: %d       \n", word_count(file_path));
 
     printf("\n ->");
     char response;
@@ -324,11 +328,16 @@ void file_write_screen(char *file_path)
     case 'w':
         // implement write
         print_ylw("Write mode", NULL);
+        write_miniscreen(file_path);
+        file_write_screen(file_path); // return
         break;
     case 'r':
         // read file
         print_grn("Read Mode", NULL);
-        line_reader(file_path);
+        if (line_reader(file_path) == 0)
+        {
+            print_ylw("This file is empty.", NULL);
+        }
         print_blu("\nPress enter to continue.", NULL);
         pause_input();
         file_write_screen(file_path); // return

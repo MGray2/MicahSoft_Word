@@ -58,15 +58,15 @@ void file_constructor(char *folder_name, char *file_name)
 
 /* Evaluates the folder for exact instances of file name.
 Returns true if duplicate located, false otherwise. (actor.h)*/
-int file_search(char *folder_path, char *file_name)
+int file_search(char *folder_name, char *file_name)
 {
     int file_found = 0;
 #ifdef _WIN32
     WIN32_FIND_DATA find_file_data;
-    HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
+    HANDLE hFind = FindFirstFile(folder_name, &find_file_data);
     if (hFind == INVALID_HANDLE_VALUE)
     {
-        printf("Error opening directory: %s\n", folder_path);
+        printf("Error opening directory: %s\n", folder_name);
         return 0;
     }
     do
@@ -140,32 +140,31 @@ void show_files(char *folder_path)
 #endif
 }
 
-// For use in read mode, scans file path and writes line-by-line enumerated text into output. (actor.h)
-void line_reader(char *source_path)
+// For use in read mode, scans file path and writes line-by-line enumerated text into output. Returns last number in the line counter. (actor.h)
+unsigned int line_reader(const char *src_path)
 {
     char *buffer = NULL;
     size_t bufsize = 0;
     ssize_t line_length;
     int line_counter = 1;
-    FILE *file_obj = fopen(source_path, "r");
-    if (is_file_empty(file_obj))
+    FILE *file = fopen(src_path, "r");
+    if (is_file_empty(file))
     {
-        print_ylw("File is empty.", NULL);
-        return;
+        return 0;
     }
-    while ((line_length = getline(&buffer, &bufsize, file_obj)) != -1)
+    while ((line_length = getline(&buffer, &bufsize, file)) != -1)
     {
         if (line_length == -1)
         {
-            if (feof(file_obj))
+            if (feof(file))
             {
                 // End of file reached
-                return;
+                return 0;
             }
             else
             {
                 perror("Error reading line");
-                return;
+                return 0;
             }
         }
         // Remove the newline character
@@ -175,9 +174,51 @@ void line_reader(char *source_path)
         }
 
         // Print the line number and the line
-        printf("%d: %s\n", line_counter, buffer);
+        printf("\x1b[34m%d:\x1b[0m %s\n", line_counter, buffer);
         line_counter++;
     }
     free(buffer);
-    fclose(file_obj);
+    fclose(file);
+    return line_counter;
+}
+
+// Returns the word count of a file. (actor.h)
+int word_count(const char *src_path)
+{
+    FILE *file = fopen(src_path, "r");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        return -1;
+    }
+
+    int word_count = 0;
+    int ch;
+    int in_word = 0; // Flag to indicate if we are inside a word
+
+    // Read characters one by one until EOF is reached
+    while ((ch = fgetc(file)) != EOF)
+    {
+        if (isspace(ch) || ch == '\n')
+        {
+            if (in_word)
+            {
+                in_word = 0; // Not inside a word anymore
+                word_count++;
+            }
+        }
+        else
+        {
+            in_word = 1; // Inside a word
+        }
+    }
+
+    // Check if the last word was counted
+    if (in_word)
+    {
+        word_count++;
+    }
+
+    fclose(file);
+    return word_count;
 }
