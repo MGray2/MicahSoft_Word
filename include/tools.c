@@ -159,6 +159,46 @@ void print_ylw(char *message, ...)
     printf("\x1b[33m%s\x1b[0m\n", buffer);
 }
 
+// Prints terminal cyan text, additional arguments must be string and end with NULL. (tools.h)
+void print_cyn(char *message, ...)
+{
+    va_list args;
+    va_start(args, message);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s", message);
+
+    const char *arg;
+    while ((arg = va_arg(args, const char *)) != NULL)
+    {
+        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
+        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
+    }
+    va_end(args);
+
+    printf("\x1b[36m%s\x1b[0m\n", buffer);
+}
+
+// Prints terminal magenta text, additional arguments must be string and end with NULL. (tools.h)
+void print_mgt(char *message, ...)
+{
+    va_list args;
+    va_start(args, message);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "%s", message);
+
+    const char *arg;
+    while ((arg = va_arg(args, const char *)) != NULL)
+    {
+        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
+        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
+    }
+    va_end(args);
+
+    printf("\x1b[35m%s\x1b[0m\n", buffer);
+}
+
 // Removes the substring from the given string, returns a new string. (tools.h)
 char *remove_substring(const char *str, const char *sub)
 {

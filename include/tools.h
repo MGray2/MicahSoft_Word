@@ -16,5 +16,7 @@ void print_red(char *message, ...);
 void print_grn(char *message, ...);
 void print_blu(char *message, ...);
 void print_ylw(char *message, ...);
+void print_cyn(char *message, ...);
+void print_mgt(char *message, ...);
 
 #endif
