@@ -222,3 +222,105 @@ int word_count(const char *src_path)
     fclose(file);
     return word_count;
 }
+
+// structure for adaptable string array (actor.h)
+typedef struct
+{
+    char **array;
+    size_t size;
+    size_t capacity;
+} Str_array;
+
+// Constructor for Str_array (actor.h)
+void init_str_array(Str_array *arr, size_t initial_capacity)
+{
+    arr->array = malloc(initial_capacity * sizeof(char *));
+    arr->size = 0;
+    arr->capacity = initial_capacity;
+}
+
+// Helper function to upgrade Str_array size (actor.h)
+void resize_str_array(Str_array *arr)
+{
+    arr->capacity *= 2;
+    arr->array = realloc(arr->array, arr->capacity * sizeof(char *));
+}
+
+// Helper function to add a string to Str_array, will call resize function. (actor.h)
+void add_str(Str_array *arr, const char *str)
+{
+    if (arr->size >= arr->capacity)
+    {
+        resize_str_array(arr);
+    }
+    arr->array[arr->size] = malloc((strlen(str) + 1) * sizeof(char));
+    strcpy(arr->array[arr->size], str);
+    arr->size++;
+}
+
+// Helper function to free allocated memory of Str_array. (actor.h)
+void free_str_array(Str_array *arr)
+{
+    for (size_t i = 0; i < arr->size; i++)
+    {
+        free(arr->array[i]);
+    }
+    free(arr->array);
+}
+
+// Reads from file and writes to Str_array. (actor.h)
+void read_file_to_array(const char *file_name, Str_array *arr)
+{
+    FILE *file = fopen(file_name, "r");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        return;
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, file)) != -1)
+    {
+        // Remove the newline character if present
+        if (line[read - 1] == '\n')
+        {
+            line[read - 1] = '\0';
+        }
+        add_str(arr, line);
+    }
+
+    free(line);
+    fclose(file);
+}
+
+// Replaces the targeted line in Str_array. (actor.h)
+void replace_line(Str_array *arr, size_t line_number, const char *new_line)
+{
+    if (line_number < arr->size)
+    {
+        free(arr->array[line_number]);                                           // Free the old line
+        arr->array[line_number] = malloc((strlen(new_line) + 1) * sizeof(char)); // Allocate memory for the new line
+        strcpy(arr->array[line_number], new_line);                               // Copy the new line into the allocated memory
+    }
+}
+
+// Overwrites file with contents of Str_array. (actor.h)
+void write_array_to_file(const char *file_name, const Str_array *arr)
+{
+    FILE *file = fopen(file_name, "w");
+    if (file == NULL)
+    {
+        perror("Error opening file for writing");
+        return;
+    }
+
+    for (size_t i = 0; i < arr->size; i++)
+    {
+        fprintf(file, "%s\n", arr->array[i]); // Write each string to the file
+    }
+
+    fclose(file);
+}

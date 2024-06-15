@@ -271,29 +271,58 @@ void write_miniscreen(char *source_file)
 {
     clear_screen();
     unsigned int line_counter = line_reader(source_file);
-    if (line_counter == 0)
-    {
-        line_counter = 1;
-    }
-    FILE *file_r = fopen(source_file, "r");
     FILE *file;
-    file = fopen(source_file, line_counter == 0 ? "w" : "a");
-    fclose(file_r);
     char response[1024] = "";
     clear_input_buffer();
 
     while (1)
     {
+        file = fopen(source_file, line_counter == 0 ? "w" : "a");
+        if (line_counter == 0)
+        {
+            line_counter = 1;
+        }
         printf("\x1b[34m%d:\x1b[0m ", line_counter);
         fgets(response, sizeof(response), stdin);
         if (strcmp(response, "/quit\n") == 0)
         {
+            fclose(file);
             break;
+        }
+        if (strcmp(response, "/replace\n") == 0)
+        {
+            unsigned int line_target;
+            char new_text[1024];
+            Str_array arr;
+            init_str_array(&arr, 2);
+            read_file_to_array(source_file, &arr);
+            while (1)
+            {
+                print_ylw("Line number to replace: ", NULL);
+                int status = scanf("%d", &line_target);
+                clear_input_buffer();
+                if (line_target < 0)
+                {
+                    continue;
+                }
+                if (status == 1)
+                {
+                    line_target--; // 0 based index
+                    print_ylw("New text: ", NULL);
+                    fgets(new_text, sizeof(new_text), stdin);
+                    remove_newline(new_text);
+                    replace_line(&arr, line_target, new_text);
+                    write_array_to_file(source_file, &arr);
+                    free_str_array(&arr);
+                    break;
+                }
+            }
+            continue;
         }
         fwrite(response, 1, strlen(response), file);
         line_counter++;
+        fclose(file);
     }
-    fclose(file);
 }
 
 /* The file menu before any changes occur. Needs the full file path as an argument.
