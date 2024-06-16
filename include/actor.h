@@ -24,5 +24,5 @@ void free_str_array(Str_array *arr);
 void read_file_to_array(const char *file_name, Str_array *arr);
 void replace_line(Str_array *arr, size_t line_number, const char *new_line);
 void write_array_to_file(const char *file_name, const Str_array *arr);
-
+void remove_last_line(Str_array *arr);
 #endif

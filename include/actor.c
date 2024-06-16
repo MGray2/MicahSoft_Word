@@ -324,3 +324,19 @@ void write_array_to_file(const char *file_name, const Str_array *arr)
 
     fclose(file);
 }
+
+// Remove the last line in Str_array
+void remove_last_line(Str_array *arr)
+{
+    if (arr->size > 0)
+    {
+        // Free the memory for the last line
+        free(arr->array[arr->size - 1]);
+        // Decrease the size of the array
+        arr->size--;
+    }
+    else
+    {
+        printf("The array is empty, no line to remove.\n");
+    }
+}

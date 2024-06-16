@@ -17,16 +17,16 @@
 void title_screen(void)
 {
     printf(" \n");
-    printf("\x1b[44m                                              \x1b[0m\n");
-    printf("\x1b[44m         \x1b[0m       MicahSoft Word       \x1b[44m         \x1b[0m\n");
-    printf("\x1b[44m         \x1b[0m         C Edition          \x1b[44m         \x1b[0m\n");
-    printf("\x1b[44m                                              \x1b[0m\n");
-    printf("\x1b[44m  \x1b[0m                                          \x1b[44m  \x1b[0m\n");
-    printf("\x1b[44m  \x1b[0m       \x1b[30m\x1b[47mn\x1b[0mew file        \x1b[30m\x1b[47mf\x1b[0mind file          \x1b[44m  \x1b[0m\n");
-    printf("\x1b[44m  \x1b[0m                                          \x1b[44m  \x1b[0m\n");
-    printf("\x1b[44m  \x1b[0m       \x1b[30m\x1b[47mi\x1b[0mnformation     \x1b[30m\x1b[47mq\x1b[0muit               \x1b[44m  \x1b[0m\n");
-    printf("\x1b[44m  \x1b[0m                                          \x1b[44m  \x1b[0m\n");
-    printf("\x1b[44m                                              \x1b[0m\n");
+    printf("\x1b[46m                                              \x1b[0m\n");
+    printf("\x1b[46m         \x1b[0m       MicahSoft Word       \x1b[46m         \x1b[0m\n");
+    printf("\x1b[46m         \x1b[0m         C Edition          \x1b[46m         \x1b[0m\n");
+    printf("\x1b[46m                                              \x1b[0m\n");
+    printf("\x1b[46m  \x1b[0m                                          \x1b[46m  \x1b[0m\n");
+    printf("\x1b[46m  \x1b[0m       \x1b[30m\x1b[47mn\x1b[0mew file        \x1b[30m\x1b[47mf\x1b[0mind file          \x1b[46m  \x1b[0m\n");
+    printf("\x1b[46m  \x1b[0m                                          \x1b[46m  \x1b[0m\n");
+    printf("\x1b[46m  \x1b[0m       \x1b[30m\x1b[47mi\x1b[0mnformation     \x1b[30m\x1b[47mq\x1b[0muit               \x1b[46m  \x1b[0m\n");
+    printf("\x1b[46m  \x1b[0m                                          \x1b[46m  \x1b[0m\n");
+    printf("\x1b[46m                                              \x1b[0m\n");
 }
 
 // Controller for title input. (menu.h)
@@ -63,7 +63,7 @@ char *new_file_screen(void)
     char file_name[100];
     char folder_path[100];
     clear_screen();
-    printf("\x1b[44m              New File              \x1b[0m\n");
+    printf("\x1b[46m              New File              \x1b[0m\n");
     clear_input_buffer();
     printf("New file name: ");
     ne_input(file_name, sizeof(file_name));
@@ -122,7 +122,7 @@ char *file_find_screen(void)
     char folder_path[100];
     clear_screen();
     clear_input_buffer();
-    printf("\x1b[42m             Locate File              \x1b[0m\n");
+    printf("\x1b[46m             Locate File              \x1b[0m\n");
     strcpy(folder_path, "mscache");
 
 #ifdef _WIN32
@@ -269,14 +269,14 @@ int delete_miniscreen(char *source_file)
 
 void write_miniscreen(char *source_file)
 {
-    clear_screen();
-    unsigned int line_counter = line_reader(source_file);
     FILE *file;
     char response[1024] = "";
     clear_input_buffer();
 
     while (1)
     {
+        printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /undo  /quit \x1b[0m\n");
+        unsigned int line_counter = line_reader(source_file);
         file = fopen(source_file, line_counter == 0 ? "w" : "a");
         if (line_counter == 0)
         {
@@ -319,6 +319,27 @@ void write_miniscreen(char *source_file)
             }
             continue;
         }
+        if (strcmp(response, "/clear\n") == 0)
+        {
+            print_red("Are you sure you want to clear all text in this file? Y/N ", NULL);
+            if (yes_no_response())
+            {
+                fclose(file);
+                FILE *c_file = fopen(source_file, "w");
+                fclose(c_file);
+            }
+            continue;
+        }
+        if (strcmp(response, "/undo\n") == 0)
+        {
+            Str_array arr;
+            init_str_array(&arr, 2);
+            read_file_to_array(source_file, &arr);
+            remove_last_line(&arr);
+            write_array_to_file(source_file, &arr);
+            free_str_array(&arr);
+            continue;
+        }
         fwrite(response, 1, strlen(response), file);
         line_counter++;
         fclose(file);
@@ -341,7 +362,7 @@ void file_write_screen(char *file_path)
 #else
     strcpy(showpath, remove_substring(file_path, "mscache/"));
 #endif
-    printf("\x1b[44m          Now editing \x1b[3m'%s'          \x1b[0m\n", showpath);
+    printf("\x1b[46m          Now editing \x1b[3m'%s'          \x1b[0m\n", showpath);
     printf("\n \x1b[30m\x1b[47mw\x1b[0mrite into file    \x1b[30m\x1b[47mr\x1b[0mead file\n\n");
     printf(" \x1b[30m\x1b[47mc\x1b[0mopy file          \x1b[30m\x1b[47md\x1b[0melete file\n\n");
     printf(" \x1b[30m\x1b[47mm\x1b[0main menu          word count: %d       \n", word_count(file_path));
@@ -357,14 +378,14 @@ void file_write_screen(char *file_path)
     case 'w':
         // write file
         clear_screen();
-        print_mgt("Write mode", NULL);
+        print_cyn("Write mode", NULL);
         write_miniscreen(file_path);
         file_write_screen(file_path); // return
         break;
     case 'r':
         // read file
         clear_screen();
-        print_mgt("Read Mode", NULL);
+        print_cyn("Read Mode", NULL);
         if (line_reader(file_path) == 0)
         {
             print_ylw("This file is empty.", NULL);
@@ -385,7 +406,6 @@ void file_write_screen(char *file_path)
             file_write_screen(file_path);
         }
         break;
-
     case 'm':
         // goes back to main
         break;
