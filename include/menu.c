@@ -275,7 +275,9 @@ void write_miniscreen(char *source_file)
 
     while (1)
     {
-        printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /undo  /quit \x1b[0m\n");
+        clear_screen();
+        print_cyn("Write mode", NULL);
+        printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /undo  /shift  /quit \x1b[0m\n");
         unsigned int line_counter = line_reader(source_file);
         file = fopen(source_file, line_counter == 0 ? "w" : "a");
         if (line_counter == 0)
@@ -340,6 +342,28 @@ void write_miniscreen(char *source_file)
             free_str_array(&arr);
             continue;
         }
+        if (strcmp(response, "/shift\n") == 0)
+        {
+            unsigned int line_target;
+            printf("Shift at line: ");
+            int status = scanf("%d", &line_target);
+            clear_input_buffer();
+            if (line_target < 0)
+            {
+                continue;
+            }
+            if (status == 1)
+            {
+                line_target--;
+                Str_array arr;
+                init_str_array(&arr, 2);
+                read_file_to_array(source_file, &arr);
+                insert_string_at(&arr, line_target, "");
+                write_array_to_file(source_file, &arr);
+                free_str_array(&arr);
+            }
+            continue;
+        }
         fwrite(response, 1, strlen(response), file);
         line_counter++;
         fclose(file);
@@ -378,7 +402,6 @@ void file_write_screen(char *file_path)
     case 'w':
         // write file
         clear_screen();
-        print_cyn("Write mode", NULL);
         write_miniscreen(file_path);
         file_write_screen(file_path); // return
         break;

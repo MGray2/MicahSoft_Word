@@ -319,7 +319,8 @@ void write_array_to_file(const char *file_name, const Str_array *arr)
 
     for (size_t i = 0; i < arr->size; i++)
     {
-        fprintf(file, "%s\n", arr->array[i]); // Write each string to the file
+        // Write each string to the file
+        fprintf(file, "%s\n", arr->array[i]);
     }
 
     fclose(file);
@@ -339,4 +340,29 @@ void remove_last_line(Str_array *arr)
     {
         printf("The array is empty, no line to remove.\n");
     }
+}
+
+void insert_string_at(Str_array *arr, size_t index, const char *str)
+{
+    if (index > arr->size)
+    {
+        return; // Invalid index
+    }
+
+    // Ensure there's enough capacity
+    if (arr->size == arr->capacity)
+    {
+        arr->capacity *= 2;
+        arr->array = realloc(arr->array, arr->capacity * sizeof(char *));
+    }
+
+    // Shift elements down
+    for (size_t i = arr->size; i > index; i--)
+    {
+        arr->array[i] = arr->array[i - 1];
+    }
+
+    // Insert the new string
+    arr->array[index] = strdup(str);
+    arr->size++;
 }
