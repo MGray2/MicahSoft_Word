@@ -7,4 +7,5 @@ int title_selection(void);
 char *new_file_screen(void);
 char *file_find_screen(void);
 void file_write_screen(char *file_path);
+void information_screen();
 #endif

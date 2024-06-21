@@ -342,6 +342,7 @@ void remove_last_line(Str_array *arr)
     }
 }
 
+// Places a string in the Str_array and moves all strings after it down by one place. (actor.h)
 void insert_string_at(Str_array *arr, size_t index, const char *str)
 {
     if (index > arr->size)

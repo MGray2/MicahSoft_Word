@@ -58,6 +58,8 @@ int main()
         break;
     case 2:
         // Information
+        information_screen();
+        main();
         break;
     case 3:
         // Quit the program

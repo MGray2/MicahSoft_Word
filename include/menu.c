@@ -436,3 +436,39 @@ void file_write_screen(char *file_path)
         break;
     }
 }
+
+void information_screen()
+{
+    char info_path[21];
+    char file_name[] = "information";
+#ifdef _WIN32
+    strcpy(info_path, "mscache\\*");
+#else
+    strcpy(info_path, "mscache/");
+#endif
+
+    if (file_search(info_path, file_name))
+    {
+#ifdef _WIN32
+        remove_asterisk(info_path);
+#endif
+        // open in read mode
+        strcat(info_path, file_name);
+        clear_screen();
+        line_reader(info_path);
+        print_blu("\nPress enter to continue.", NULL);
+        pause_input();
+    }
+    else
+    {
+#ifdef _WIN32
+        remove_asterisk(info_path);
+#endif
+        // could not read the file
+        strcat(info_path, file_name);
+        clear_screen();
+        print_red("Cannot read from", info_path, ": File is missing.", NULL);
+        print_blu("\nPress enter to continue.", NULL);
+        pause_input();
+    }
+}
