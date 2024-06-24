@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include "tools.h"
 
+#ifdef _WIN32 // for Windows users
+#include <windows.h>
+#else // for Unix users (macOS, Linux, etc.)
+#include <dirent.h>
+#include <unistd.h>
+#endif
+
 // Consumes the input line for future use. (tools.h)
 void clear_input_buffer()
 {
@@ -35,6 +42,39 @@ void remove_asterisk(char *str)
 int yes_no_response()
 {
     char response;
+    do
+    {
+        response = getchar();
+    } while (tolower(response) != 'y' && tolower(response) != 'n');
+    if (tolower(response) == 'y')
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+// Similar to yes_no_response() but with a delayed timer for use with permanent decisions. (tools.h)
+int confirmation()
+{
+    char response;
+    short loop = 3;
+    while (loop > -1)
+    {
+#ifdef _WIN32
+        Sleep(1000);
+        printf("%d\r", loop);
+        loop--;
+#else
+
+        sleep(1);
+        printf("%d\r", loop);
+        loop--;
+#endif
+    }
+    printf(">");
     do
     {
         response = getchar();

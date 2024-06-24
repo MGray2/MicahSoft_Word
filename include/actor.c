@@ -350,7 +350,6 @@ void insert_string_at(Str_array *arr, size_t index, const char *str)
         return; // Invalid index
     }
 
-    // Ensure there's enough capacity
     if (arr->size == arr->capacity)
     {
         arr->capacity *= 2;
@@ -366,4 +365,24 @@ void insert_string_at(Str_array *arr, size_t index, const char *str)
     // Insert the new string
     arr->array[index] = strdup(str);
     arr->size++;
+}
+
+// Removes specified line and shifts below line up. (actor.h)
+void remove_string_at(Str_array *arr, size_t index)
+{
+    if (index >= arr->size)
+    {
+        return; // Invalid index
+    }
+
+    // Free the memory for the string at the index
+    free(arr->array[index]);
+
+    // Shift elements up
+    for (size_t i = index; i < arr->size - 1; i++)
+    {
+        arr->array[i] = arr->array[i + 1];
+    }
+
+    arr->size--;
 }

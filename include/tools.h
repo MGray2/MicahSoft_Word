@@ -7,6 +7,7 @@ void remove_newline(char *str);
 void remove_asterisk(char *str);
 char *remove_substring(const char *str, const char *sub);
 int yes_no_response(void);
+int confirmation();
 void ne_input(char *dest_str, int input_size);
 void pause_input(void);
 void clear_screen(void);

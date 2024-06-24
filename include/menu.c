@@ -240,13 +240,7 @@ int delete_miniscreen(char *source_file)
     strcpy(showpath, remove_substring(source_file, "mscache/"));
 #endif
     print_red("Are you sure you want to delete", showpath, "? Y/N", NULL);
-#ifdef _WIN32
-    Sleep(2000);
-#else
-    sleep(2);
-#endif
-    printf("->");
-    if (yes_no_response())
+    if (confirmation())
     {
         if (remove(source_file) == 0)
         {
@@ -277,7 +271,7 @@ void write_miniscreen(char *source_file)
     {
         clear_screen();
         print_cyn("Write mode", NULL);
-        printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /undo  /shift  /quit \x1b[0m\n");
+        printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /remove  /undo  /shift  /quit \x1b[0m\n");
         unsigned int line_counter = line_reader(source_file);
         file = fopen(source_file, line_counter == 0 ? "w" : "a");
         if (line_counter == 0)
@@ -324,7 +318,7 @@ void write_miniscreen(char *source_file)
         if (strcmp(response, "/clear\n") == 0)
         {
             print_red("Are you sure you want to clear all text in this file? Y/N ", NULL);
-            if (yes_no_response())
+            if (confirmation())
             {
                 fclose(file);
                 FILE *c_file = fopen(source_file, "w");
@@ -359,6 +353,28 @@ void write_miniscreen(char *source_file)
                 init_str_array(&arr, 2);
                 read_file_to_array(source_file, &arr);
                 insert_string_at(&arr, line_target, "");
+                write_array_to_file(source_file, &arr);
+                free_str_array(&arr);
+            }
+            continue;
+        }
+        if (strcmp(response, "/remove\n") == 0)
+        {
+            unsigned int line_target;
+            printf("Remove at line: ");
+            int status = scanf("%d", &line_target);
+            clear_input_buffer();
+            if (line_target < 0)
+            {
+                continue;
+            }
+            if (status == 1)
+            {
+                line_target--;
+                Str_array arr;
+                init_str_array(&arr, 2);
+                read_file_to_array(source_file, &arr);
+                remove_string_at(&arr, line_target);
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
             }

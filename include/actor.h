@@ -26,4 +26,5 @@ void replace_line(Str_array *arr, size_t line_number, const char *new_line);
 void write_array_to_file(const char *file_name, const Str_array *arr);
 void remove_last_line(Str_array *arr);
 void insert_string_at(Str_array *arr, size_t index, const char *str);
+void remove_string_at(Str_array *arr, size_t index);
 #endif
