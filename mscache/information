@@ -14,7 +14,7 @@ The program will evaluate the contents of the file you are working on to determi
 write mode or append mode.
 Unlike the original MicahSoft Word, this program will read the file for you as you write and in read mode.
 
-In write mode you will have commands to modify your writting, these commands start with a slash "/" symbol
+In write mode you will have commands to modify your writing, these commands start with a slash "/" symbol
 and the command name should be written by itself on an empty line.
 
 "/clear" will completely clear all content in the file, a confirmation message will give you one last chance
@@ -24,7 +24,8 @@ It will then ask for the new sentence.
 "/undo" will remove the last line of the file, the undo command will not work on replaced lines and should only
 be used to remove lines.
 "/shift" will place an empty line anywhere in your file, it will ask for the line number. You can use "/replace"
-to modify the newly created space.
+to modify the newly created space. Lines after the newly placed line will shift downwards by one place.
 "/quit" will exit the writing menu.
+"/remove" works like the opposite of shift, it will remove a specified line and shift the lines after it upwards.
 
-This file was created using msword.
+This information page was writen in MicahSoft Word.
