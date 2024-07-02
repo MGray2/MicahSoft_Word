@@ -174,7 +174,22 @@ unsigned int line_reader(const char *src_path)
         }
 
         // Print the line number and the line
-        printf("\x1b[34m%d:\x1b[0m %s\n", line_counter, buffer);
+        if (line_counter <= 9)
+        {
+            printf("\x1b[34m   %d:\x1b[0m %s\n", line_counter, buffer); // 3 spaces
+        }
+        else if (line_counter <= 99)
+        {
+            printf("\x1b[34m  %d:\x1b[0m %s\n", line_counter, buffer); // 2 spaces
+        }
+        else if (line_counter <= 999)
+        {
+            printf("\x1b[34m %d:\x1b[0m %s\n", line_counter, buffer); // 1 space
+        }
+        else
+        {
+            printf("\x1b[34m%d:\x1b[0m %s\n", line_counter, buffer); // no space
+        }
         line_counter++;
     }
     free(buffer);

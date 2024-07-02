@@ -239,8 +239,7 @@ int delete_miniscreen(char *source_file)
 #else
     strcpy(showpath, remove_substring(source_file, "mscache/"));
 #endif
-    print_red("Are you sure you want to delete", showpath, "? Y/N", NULL);
-    if (confirmation())
+    if (confirmation("Are you sure you want to delete %s%s", showpath, "? Y/N"))
     {
         if (remove(source_file) == 0)
         {
@@ -317,8 +316,7 @@ void write_miniscreen(char *source_file)
         }
         if (strcmp(response, "/clear\n") == 0)
         {
-            print_red("Are you sure you want to clear all text in this file? Y/N ", NULL);
-            if (confirmation())
+            if (confirmation("Are you sure you want to clear all text in this file? Y/N"))
             {
                 fclose(file);
                 FILE *c_file = fopen(source_file, "w");
@@ -471,6 +469,7 @@ void information_screen()
         // open in read mode
         strcat(info_path, file_name);
         clear_screen();
+        print_cyn("Read Mode", NULL);
         line_reader(info_path);
         print_blu("\nPress enter to continue.", NULL);
         pause_input();

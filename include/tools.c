@@ -56,25 +56,32 @@ int yes_no_response()
     }
 }
 
-// Similar to yes_no_response() but with a delayed timer for use with permanent decisions. (tools.h)
-int confirmation()
+/* Similar to yes_no_response() but with a delayed timer for use with permanent decisions.
+Allows string arguments to write warning message. (tools.h)
+*/
+int confirmation(const char *message, ...)
 {
+    char formatted_message[256];
+    va_list args;
+    va_start(args, message);
+    vsnprintf(formatted_message, sizeof(formatted_message), message, args);
+    va_end(args);
+
     char response;
-    short loop = 3;
+    short loop = 5;
     while (loop > -1)
     {
 #ifdef _WIN32
         Sleep(1000);
-        printf("%d\r", loop);
-        loop--;
 #else
-
         sleep(1);
-        printf("%d\r", loop);
-        loop--;
 #endif
+        printf("\r\x1b[31m%s\x1b[0m %d", formatted_message, loop);
+        fflush(stdout);
+        loop--;
     }
-    printf(">");
+    printf("\r\x1b[31m%s\x1b[0m %s", formatted_message, ">");
+    fflush(stdout);
     do
     {
         response = getchar();
@@ -92,7 +99,11 @@ int confirmation()
 // Simply clears the screen. (tools.h)
 void clear_screen(void)
 {
-    printf("\x1b[2J");
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 /* Prints message suitable for debug purposes,
