@@ -29,11 +29,11 @@ More details of the program is explained in the information file.
 > Once you clone this project, you may need to compile the program if you cannot used the already compiled _msword.exe_ object. I have used both clang and gcc during development of MicahSoft Word.
 
 > To compile with gcc use this command:
-> `gcc -o msword main.c include/actor.c include/menu.c inlclude/tools.c`
+> `gcc -o msword main.c include/actor.c include/menu.c include/tools.c`
 
 > For clang it should be:
-> `clang -o msword main.c include/actor.c include/menu.c inlclude/tools.c`
+> `clang -o msword main.c include/actor.c include/menu.c include/tools.c`
 
 > The "msword" after the -o argument can be whatever you want to name the program, but for this example when the compiled object is created you simply need to navigate to the project folder and type in `./msword.exe` or `./msword` to run the project
 
-I recommend that you use a terminal with a dark theme rather than a light theme when running MicahSoft Word.
+I recommend that you use a terminal with a dark theme rather than a light theme when running MicahSoft Word (as long as its not completely white background).
