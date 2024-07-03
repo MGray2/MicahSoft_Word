@@ -67,5 +67,6 @@ int main()
     default:
         break;
     }
+    clear_screen();
     return 0;
 }

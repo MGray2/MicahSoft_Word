@@ -302,8 +302,8 @@ void write_miniscreen(char *source_file)
                 }
                 if (status == 1)
                 {
-                    line_target--; // 0 based index
-                    printf("New text: ");
+                    printf("\x1b[32m%d:\x1b[0m ", line_target); // Replace prompt
+                    line_target--;                              // 0 based index
                     fgets(new_text, sizeof(new_text), stdin);
                     remove_newline(new_text);
                     replace_line(&arr, line_target, new_text);
@@ -337,9 +337,10 @@ void write_miniscreen(char *source_file)
         if (strcmp(response, "/shift\n") == 0)
         {
             unsigned int line_target;
-            printf("Shift at line: ");
+            printf("Shift at line: \x1b[34m");
             int status = scanf("%d", &line_target);
             clear_input_buffer();
+            printf("\x1b[0m");
             if (line_target < 0)
             {
                 continue;
@@ -359,9 +360,10 @@ void write_miniscreen(char *source_file)
         if (strcmp(response, "/remove\n") == 0)
         {
             unsigned int line_target;
-            printf("Remove at line: ");
+            printf("Remove at line: \x1b[34m");
             int status = scanf("%d", &line_target);
             clear_input_buffer();
+            printf("\x1b[0m");
             if (line_target < 0)
             {
                 continue;
@@ -454,7 +456,7 @@ void file_write_screen(char *file_path)
 void information_screen()
 {
     char info_path[21];
-    char file_name[] = "information";
+    char file_name[] = "0_information";
 #ifdef _WIN32
     strcpy(info_path, "mscache\\*");
 #else
