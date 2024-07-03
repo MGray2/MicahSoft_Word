@@ -36,4 +36,4 @@ More details of the program is explained in the information file.
 
 > The "msword" after the -o argument can be whatever you want to name the program, but for this example when the compiled object is created you simply need to navigate to the project folder and type in `./msword.exe` or `./msword` to run the project
 
-I recommend that you use a terminal with a dark theme rather than a light theme when running MicahSoft Word (as long as its not completely white background).
+I recommend that you use a terminal with a dark theme rather than a light theme when running MicahSoft Word (as long as its not a completely white background).
