@@ -277,7 +277,22 @@ void write_miniscreen(char *source_file)
         {
             line_counter = 1;
         }
-        printf("\x1b[34m%d:\x1b[0m ", line_counter);
+        if (line_counter < 10)
+        {
+            printf("   \x1b[34m%d:\x1b[0m ", line_counter); // 3 spaces
+        }
+        else if (line_counter < 100)
+        {
+            printf("  \x1b[34m%d:\x1b[0m ", line_counter); // 2 spaces
+        }
+        else if (line_counter < 1000)
+        {
+            printf(" \x1b[34m%d:\x1b[0m ", line_counter); // 1 space
+        }
+        else
+        {
+            printf("\x1b[34m%d:\x1b[0m ", line_counter); // no space
+        }
         fgets(response, sizeof(response), stdin);
         if (strcmp(response, "/quit\n") == 0)
         {
@@ -302,8 +317,24 @@ void write_miniscreen(char *source_file)
                 }
                 if (status == 1)
                 {
-                    printf("\x1b[32m%d:\x1b[0m ", line_target); // Replace prompt
-                    line_target--;                              // 0 based index
+                    if (line_target < 10) // The replace prompt
+                    {
+                        printf("   \x1b[32m%d:\x1b[0m ", line_target); // 3 spaces
+                    }
+                    else if (line_target < 100)
+                    {
+                        printf("  \x1b[32m%d:\x1b[0m ", line_target); // 2 spaces
+                    }
+                    else if (line_target < 1000)
+                    {
+                        printf(" \x1b[32m%d:\x1b[0m ", line_target); // 1 space
+                    }
+                    else
+                    {
+                        printf("\x1b[32m%d:\x1b[0m ", line_target); // no space
+                    }
+
+                    line_target--; // 0 based index
                     fgets(new_text, sizeof(new_text), stdin);
                     remove_newline(new_text);
                     replace_line(&arr, line_target, new_text);
@@ -425,7 +456,7 @@ void file_write_screen(char *file_path)
         // read file
         clear_screen();
         print_cyn("Read Mode", NULL);
-        if (line_reader(file_path) == 0)
+        if (line_reader_nonum(file_path) == 0)
         {
             print_ylw("This file is empty.", NULL);
         }

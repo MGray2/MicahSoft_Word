@@ -8,6 +8,7 @@ void file_constructor(char *folder_name, char *file_name);
 int file_search(char *folder_name, char *file_name);
 void show_files(char *folder_path);
 unsigned int line_reader(const char *src_path);
+unsigned int line_reader_nonum(const char *src_path);
 int word_count(const char *src_path);
 
 typedef struct

@@ -140,13 +140,13 @@ void show_files(char *folder_path)
 #endif
 }
 
-// For use in read mode, scans file path and writes line-by-line enumerated text into output. Returns last number in the line counter. (actor.h)
+// For use in write mode, scans file path and writes line-by-line enumerated text into output. Returns last number in the line counter. (actor.h)
 unsigned int line_reader(const char *src_path)
 {
     char *buffer = NULL;
     size_t bufsize = 0;
     ssize_t line_length;
-    int line_counter = 1;
+    unsigned int line_counter = 1;
     FILE *file = fopen(src_path, "r");
     if (is_file_empty(file))
     {
@@ -174,15 +174,15 @@ unsigned int line_reader(const char *src_path)
         }
 
         // Print the line number and the line
-        if (line_counter <= 9)
+        if (line_counter < 10)
         {
             printf("\x1b[34m   %d:\x1b[0m %s\n", line_counter, buffer); // 3 spaces
         }
-        else if (line_counter <= 99)
+        else if (line_counter < 100)
         {
             printf("\x1b[34m  %d:\x1b[0m %s\n", line_counter, buffer); // 2 spaces
         }
-        else if (line_counter <= 999)
+        else if (line_counter < 1000)
         {
             printf("\x1b[34m %d:\x1b[0m %s\n", line_counter, buffer); // 1 space
         }
@@ -195,6 +195,46 @@ unsigned int line_reader(const char *src_path)
     free(buffer);
     fclose(file);
     return line_counter;
+}
+
+// Line reader function without a number counter for use with read mode. Only returns 0 if file empty. (actor.h)
+unsigned int line_reader_nonum(const char *src_path)
+{
+    char *buffer = NULL;
+    size_t bufsize = 0;
+    ssize_t line_length;
+    FILE *file = fopen(src_path, "r");
+    if (is_file_empty(file))
+    {
+        return 0;
+    }
+    while ((line_length = getline(&buffer, &bufsize, file)) != -1)
+    {
+        if (line_length == -1)
+        {
+            if (feof(file))
+            {
+                // End of file reached
+                return 0;
+            }
+            else
+            {
+                perror("Error reading line");
+                return 0;
+            }
+        }
+        // Remove the newline character
+        if (buffer[line_length - 1] == '\n')
+        {
+            buffer[line_length - 1] = '\0';
+        }
+
+        // Print the line number and the line
+        printf("%s\n", buffer);
+    }
+    free(buffer);
+    fclose(file);
+    return 1;
 }
 
 // Returns the word count of a file. (actor.h)
