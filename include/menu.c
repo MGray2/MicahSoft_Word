@@ -299,7 +299,7 @@ void write_miniscreen(char *source_file)
             fclose(file);
             break;
         }
-        if (strcmp(response, "/replace\n") == 0)
+        else if (strcmp(response, "/replace\n") == 0)
         {
             unsigned int line_target;
             char new_text[1024];
@@ -308,9 +308,10 @@ void write_miniscreen(char *source_file)
             read_file_to_array(source_file, &arr);
             while (1)
             {
-                printf("Line number to replace: ");
+                printf("Replace at line: \x1b[34m");
                 int status = scanf("%d", &line_target);
                 clear_input_buffer();
+                printf("\x1b[0m");
                 if (line_target < 0)
                 {
                     continue;
@@ -319,18 +320,22 @@ void write_miniscreen(char *source_file)
                 {
                     if (line_target < 10) // The replace prompt
                     {
+                        printf("   \x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
                         printf("   \x1b[32m%d:\x1b[0m ", line_target); // 3 spaces
                     }
                     else if (line_target < 100)
                     {
+                        printf("  \x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
                         printf("  \x1b[32m%d:\x1b[0m ", line_target); // 2 spaces
                     }
                     else if (line_target < 1000)
                     {
+                        printf(" \x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
                         printf(" \x1b[32m%d:\x1b[0m ", line_target); // 1 space
                     }
                     else
                     {
+                        printf("\x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
                         printf("\x1b[32m%d:\x1b[0m ", line_target); // no space
                     }
 
@@ -345,7 +350,7 @@ void write_miniscreen(char *source_file)
             }
             continue;
         }
-        if (strcmp(response, "/clear\n") == 0)
+        else if (strcmp(response, "/clear\n") == 0)
         {
             if (confirmation("Are you sure you want to clear all text in this file? Y/N"))
             {
@@ -355,7 +360,7 @@ void write_miniscreen(char *source_file)
             }
             continue;
         }
-        if (strcmp(response, "/undo\n") == 0)
+        else if (strcmp(response, "/undo\n") == 0)
         {
             Str_array arr;
             init_str_array(&arr, 2);
@@ -365,7 +370,7 @@ void write_miniscreen(char *source_file)
             free_str_array(&arr);
             continue;
         }
-        if (strcmp(response, "/shift\n") == 0)
+        else if (strcmp(response, "/shift\n") == 0)
         {
             unsigned int line_target;
             printf("Shift at line: \x1b[34m");
@@ -388,7 +393,7 @@ void write_miniscreen(char *source_file)
             }
             continue;
         }
-        if (strcmp(response, "/remove\n") == 0)
+        else if (strcmp(response, "/remove\n") == 0)
         {
             unsigned int line_target;
             printf("Remove at line: \x1b[34m");
@@ -409,6 +414,10 @@ void write_miniscreen(char *source_file)
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
             }
+            continue;
+        }
+        else if (response[0] == '/')
+        {
             continue;
         }
         fwrite(response, 1, strlen(response), file);
