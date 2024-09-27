@@ -1,6 +1,7 @@
 #ifndef TOOLS_H_
 // Set of helper functions for input and output.
 #define TOOLS_H_
+#include <stdio.h>
 
 void clear_input_buffer(void);
 void remove_newline(char *str);

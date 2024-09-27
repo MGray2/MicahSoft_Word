@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include "include/menu.h"
-#include "include/tools.h"
+#include "menu.h"
+#include "tools.h"
 
 #ifdef _WIN32 // for Windows users
 #include <direct.h>
