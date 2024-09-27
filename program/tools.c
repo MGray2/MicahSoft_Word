@@ -250,6 +250,91 @@ void print_mgt(char *message, ...)
     printf("\x1b[35m%s\x1b[0m\n", buffer);
 }
 
+/* Prints enumerated colored lines with formatted spacing, for use with read and write menus.
+color arguments include: "red", "green" and "blue". (tools.h) */
+void print_enum(char *color, const unsigned int number_counter, char *text)
+{
+    char font_color[10];
+    if (strcmp(color, "red") == 0)
+    {
+        strcpy(font_color, "\x1b[31m");
+    }
+    else if (strcmp(color, "blue") == 0)
+    {
+        strcpy(font_color, "\x1b[34m");
+    }
+    else if (strcmp(color, "green") == 0)
+    {
+        strcpy(font_color, "\x1b[32m");
+    }
+    else
+    {
+        strcpy(font_color, "");
+    }
+
+    // Print the line number and the line
+    if (number_counter < 10)
+    {
+        printf("%s   %d:\x1b[0m %s\n", font_color, number_counter, text); // 3 spaces
+    }
+    else if (number_counter < 100)
+    {
+        printf("%s  %d:\x1b[0m %s\n", font_color, number_counter, text); // 2 spaces
+    }
+    else if (number_counter < 1000)
+    {
+        printf("%s %d:\x1b[0m %s\n", font_color, number_counter, text); // 1 space
+    }
+    else
+    {
+        printf("%s%d:\x1b[0m %s\n", font_color, number_counter, text); // no space
+    }
+}
+
+// Prints enumerated blue input with formatted spacing, for use with writer. (tools.h)
+void print_eninp(const unsigned int number_counter)
+{
+    // Print the line number and the line
+    if (number_counter < 10)
+    {
+        printf("\x1b[34m   %d:\x1b[0m ", number_counter); // 3 spaces
+    }
+    else if (number_counter < 100)
+    {
+        printf("\x1b[34m  %d:\x1b[0m ", number_counter); // 2 spaces
+    }
+    else if (number_counter < 1000)
+    {
+        printf("\x1b[34m %d:\x1b[0m ", number_counter); // 1 space
+    }
+    else
+    {
+        printf("\x1b[34m%d:\x1b[0m ", number_counter); // no space
+    }
+}
+
+// Prints enumerated yellow line with formatted spacing, for use with reading directory. (tools.h)
+void print_enylw(const unsigned int number_counter, char *text)
+{
+    // Print the line number and the line
+    if (number_counter < 10)
+    {
+        printf("\x1b[33m    !: %s\x1b[0m\n", text); // 4 spaces
+    }
+    else if (number_counter < 100)
+    {
+        printf("\x1b[33m   !: %s\x1b[0m\n", text); // 3 spaces
+    }
+    else if (number_counter < 1000)
+    {
+        printf("\x1b[33m  !: %s\x1b[0m\n", text); // 2 spaces
+    }
+    else
+    {
+        printf("\x1b[33m !: %s\x1b[0m\n", text); // 1 space
+    }
+}
+
 // Removes the substring from the given string, returns a new string. (tools.h)
 char *remove_substring(const char *str, const char *sub)
 {

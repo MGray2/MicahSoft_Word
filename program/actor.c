@@ -61,6 +61,7 @@ Returns true if duplicate located, false otherwise. (actor.h)*/
 int file_search(char *folder_name, char *file_name)
 {
     int file_found = 0;
+    unsigned int item_counter = 1;
 #ifdef _WIN32
     WIN32_FIND_DATA find_file_data;
     HANDLE hFind = FindFirstFile(folder_name, &find_file_data);
@@ -71,12 +72,16 @@ int file_search(char *folder_name, char *file_name)
     }
     do
     {
-        printf("%s\n", find_file_data.cFileName); // Print each file name
-        if (strcmp(find_file_data.cFileName, file_name) == 0)
+        if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
         {
-            print_ylw(find_file_data.cFileName, "!", NULL);
-            file_found = 1;
-            break;
+            print_enum("green", item_counter, find_file_data.cFileName); // Print each file name
+            if (strcmp(find_file_data.cFileName, file_name) == 0)
+            {
+                print_enylw(item_counter, find_file_data.cFileName);
+                file_found = 1;
+                break;
+            }
+            item_counter++;
         }
     } while (FindNextFile(hFind, &find_file_data) != 0);
     FindClose(hFind);
@@ -87,12 +92,16 @@ int file_search(char *folder_name, char *file_name)
     {
         while ((ent = readdir(dir)) != NULL)
         {
-            printf("%s\n", ent->d_name); // show files
-            if (strcmp(ent->d_name, file_name) == 0)
+            if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
             {
-                printf("\x1b[31m%s\x1b[0m\n", ent->d_name); // red highlight for duplicate
-                file_found = 1;
-                break;
+                print_enum("green", item_counter, ent->d_name);
+                if (strcmp(ent->d_name, file_name) == 0)
+                {
+                    print_enylw(item_counter, ent->d_name);
+                    file_found = 1;
+                    break;
+                }
+                item_counter++;
             }
         }
         closedir(dir);
@@ -111,6 +120,7 @@ int file_search(char *folder_name, char *file_name)
 // Simply displays all file names under the folder. (actor.h)
 void show_files(char *folder_path)
 {
+    unsigned int item_counter = 1;
 #ifdef _WIN32
     WIN32_FIND_DATA find_file_data;
     HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
@@ -122,7 +132,11 @@ void show_files(char *folder_path)
 
     do
     {
-        printf("%s\n", find_file_data.cFileName); // Print each file name
+        if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
+        {
+            print_enum("green", item_counter, find_file_data.cFileName); // Print each file name
+            item_counter++;
+        }
 
     } while (FindNextFile(hFind, &find_file_data) != 0);
     FindClose(hFind);
@@ -133,7 +147,11 @@ void show_files(char *folder_path)
     {
         while ((ent = readdir(dir)) != NULL)
         {
-            printf("%s\n", ent->d_name); // show files
+            if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
+            {
+                print_enum("green", item_counter, ent->d_name);
+                item_counter++;
+            }
         }
         closedir(dir);
     }
@@ -174,22 +192,7 @@ unsigned int line_reader(const char *src_path)
         }
 
         // Print the line number and the line
-        if (line_counter < 10)
-        {
-            printf("\x1b[34m   %d:\x1b[0m %s\n", line_counter, buffer); // 3 spaces
-        }
-        else if (line_counter < 100)
-        {
-            printf("\x1b[34m  %d:\x1b[0m %s\n", line_counter, buffer); // 2 spaces
-        }
-        else if (line_counter < 1000)
-        {
-            printf("\x1b[34m %d:\x1b[0m %s\n", line_counter, buffer); // 1 space
-        }
-        else
-        {
-            printf("\x1b[34m%d:\x1b[0m %s\n", line_counter, buffer); // no space
-        }
+        print_enum("blue", line_counter, buffer);
         line_counter++;
     }
     free(buffer);

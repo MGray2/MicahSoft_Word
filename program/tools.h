@@ -20,5 +20,8 @@ void print_blu(char *message, ...);
 void print_ylw(char *message, ...);
 void print_cyn(char *message, ...);
 void print_mgt(char *message, ...);
+void print_enum(char *color, const unsigned int number_counter, char *text);
+void print_eninp(const unsigned int number_counter);
+void print_enylw(const unsigned int number_counter, char *text);
 
 #endif

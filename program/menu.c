@@ -135,6 +135,8 @@ char *file_find_screen(void)
     printf("File name: ");
     ne_input(file_name, sizeof(file_name));
 
+    clear_screen();
+    printf("\x1b[46m             Locate File              \x1b[0m\n");
     if (file_search(folder_path, file_name))
     {
         remove_asterisk(folder_path);
@@ -277,22 +279,7 @@ void write_miniscreen(char *source_file)
         {
             line_counter = 1;
         }
-        if (line_counter < 10)
-        {
-            printf("   \x1b[34m%d:\x1b[0m ", line_counter); // 3 spaces
-        }
-        else if (line_counter < 100)
-        {
-            printf("  \x1b[34m%d:\x1b[0m ", line_counter); // 2 spaces
-        }
-        else if (line_counter < 1000)
-        {
-            printf(" \x1b[34m%d:\x1b[0m ", line_counter); // 1 space
-        }
-        else
-        {
-            printf("\x1b[34m%d:\x1b[0m ", line_counter); // no space
-        }
+        print_eninp(line_counter);
         fgets(response, sizeof(response), stdin);
         if (strcmp(response, "/quit\n") == 0)
         {
@@ -318,26 +305,9 @@ void write_miniscreen(char *source_file)
                 }
                 if (status == 1)
                 {
-                    if (line_target < 10) // The replace prompt
-                    {
-                        printf("   \x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
-                        printf("   \x1b[32m%d:\x1b[0m ", line_target); // 3 spaces
-                    }
-                    else if (line_target < 100)
-                    {
-                        printf("  \x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
-                        printf("  \x1b[32m%d:\x1b[0m ", line_target); // 2 spaces
-                    }
-                    else if (line_target < 1000)
-                    {
-                        printf(" \x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
-                        printf(" \x1b[32m%d:\x1b[0m ", line_target); // 1 space
-                    }
-                    else
-                    {
-                        printf("\x1b[31m%d:\x1b[0m %s\n", line_target, arr.array[line_target - 1]);
-                        printf("\x1b[32m%d:\x1b[0m ", line_target); // no space
-                    }
+                    // The replace prompt
+                    print_enum("red", line_target, arr.array[line_target - 1]);
+                    print_eninp(line_target);
 
                     line_target--; // 0 based index
                     fgets(new_text, sizeof(new_text), stdin);
