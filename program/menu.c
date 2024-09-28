@@ -77,7 +77,7 @@ char *new_file_screen(void)
 
     if (file_search(folder_path, file_name))
     {
-        printf("File '%s' already exists in the directory. Rename? Y/N ", file_name);
+        printf("File %s already exists in the directory. Rename? Y/N ", file_name);
         if (yes_no_response())
         {
             new_file_screen();
@@ -188,7 +188,7 @@ void copy_miniscreen(char *source_path, char *file_name)
         {
             if (file_search(folder, copy_name)) // If duplicate name
             {
-                print_ylw("Name is already in use. Try again? Y/N ", NULL);
+                print_clr("yellow", "Name is already in use. Try again? Y/N ");
                 if (yes_no_response()) // If yes
                 {
                     copy_miniscreen(source_path, file_name);
@@ -245,7 +245,7 @@ int delete_miniscreen(char *source_file)
     {
         if (remove(source_file) == 0)
         {
-            print_grn("File", source_file, "was deleted successfully.", NULL);
+            print_clr("green", "File %s was created successfully.");
             free(source_file);
             source_file = NULL;
             return 1;
@@ -271,7 +271,7 @@ void write_miniscreen(char *source_file)
     while (1)
     {
         clear_screen();
-        print_cyn("Write mode", NULL);
+        print_clr("cyan", "Write mode");
         printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /remove  /undo  /shift  /quit \x1b[0m\n");
         unsigned int line_counter = line_reader(source_file);
         file = fopen(source_file, line_counter == 0 ? "w" : "a");
@@ -279,7 +279,7 @@ void write_miniscreen(char *source_file)
         {
             line_counter = 1;
         }
-        print_eninp(line_counter);
+        print_eninp("blue", line_counter);
         fgets(response, sizeof(response), stdin);
         if (strcmp(response, "/quit\n") == 0)
         {
@@ -307,7 +307,7 @@ void write_miniscreen(char *source_file)
                 {
                     // The replace prompt
                     print_enum("red", line_target, arr.array[line_target - 1]);
-                    print_eninp(line_target);
+                    print_eninp("green", line_target);
 
                     line_target--; // 0 based index
                     fgets(new_text, sizeof(new_text), stdin);
@@ -434,12 +434,12 @@ void file_write_screen(char *file_path)
     case 'r':
         // read file
         clear_screen();
-        print_cyn("Read Mode", NULL);
+        print_clr("cyan", "Read Mode");
         if (line_reader_nonum(file_path) == 0)
         {
-            print_ylw("This file is empty.", NULL);
+            print_clr("yellow", "This file is empty.");
         }
-        print_blu("\nPress enter to continue.", NULL);
+        print_clr("blue", "\nPress enter to continue.");
         pause_input();
         file_write_screen(file_path); // return
         break;
@@ -481,9 +481,9 @@ void information_screen()
         // open in read mode
         strcat(info_path, file_name);
         clear_screen();
-        print_cyn("Read Mode", NULL);
+        print_clr("cyan", "Read Mode");
         line_reader(info_path);
-        print_blu("\nPress enter to continue.", NULL);
+        print_clr("cyan", "\nPress enter to continue.");
         pause_input();
     }
     else
@@ -494,8 +494,8 @@ void information_screen()
         // could not read the file
         strcat(info_path, file_name);
         clear_screen();
-        print_red("Cannot read from", info_path, ": File is missing.", NULL);
-        print_blu("\nPress enter to continue.", NULL);
+        print_clr("red", "Cannot read from %s: File is missing.", info_path);
+        print_clr("blue", "\nPress enter to continue.");
         pause_input();
     }
 }

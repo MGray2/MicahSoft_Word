@@ -31,7 +31,7 @@ int main()
     }
     if (mkdir(directory, 0777) == 0)
     {
-        print_grn("Directory created. Your documents will be located in:", directory, NULL);
+        print_clr("green", "Directory created. Your documents will be located in: %s", directory);
 #ifdef _WIN32
         Sleep(3000);
 #else

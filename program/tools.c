@@ -109,145 +109,66 @@ void clear_screen(void)
 /* Prints message suitable for debug purposes,
 use '__FILE__' for file argument.
 use '__LINE__' for line argument.
-Additional arguments must be string, you must add 'NULL' at the end of the parameters. (tools.h) */
-void print_debug(char *message, char *file, int line, ...)
+Additional arguments can be used to format to string. (tools.h) */
+void print_debug(char *file, int line, char *message, ...)
 {
     va_list args;
-    va_start(args, line);
+    va_start(args, message);
 
     char buffer[1024];
     snprintf(buffer, sizeof(buffer), "***DEBUG*** (%s ln:%d) %s", file, line, message);
 
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
+    vsnprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), message, args);
 
     va_end(args);
 
     printf("\x1b[45m\x1b[30m%s\x1b[0m\n", buffer);
 }
 
-// Prints terminal red text, additional arguments must be string and end with NULL. (tools.h)
-void print_red(char *message, ...)
+/* Prints colored terminal text, additional arguments can be used to format variables into string.
+Color arguments include: "red", "blue", "green", "yellow", "cyan" and "magenta"
+Default color is white (tools.h) */
+void print_clr(char *color, const char *format, ...)
 {
+    char font_color[10];
+    if (strcmp(color, "red") == 0)
+    {
+        strcpy(font_color, "\x1b[31m");
+    }
+    else if (strcmp(color, "blue") == 0)
+    {
+        strcpy(font_color, "\x1b[34m");
+    }
+    else if (strcmp(color, "green") == 0)
+    {
+        strcpy(font_color, "\x1b[32m");
+    }
+    else if (strcmp(color, "yellow") == 0)
+    {
+        strcpy(font_color, "\x1b[33m");
+    }
+    else if (strcmp(color, "cyan") == 0)
+    {
+        strcpy(font_color, "\x1b[36m");
+    }
+    else if (strcmp(color, "magenta") == 0)
+    {
+        strcpy(font_color, "\x1b[35m");
+    }
+    else
+    {
+        strcpy(font_color, "");
+    }
+
     va_list args;
-    va_start(args, message);
+    va_start(args, format);
 
     char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s", message);
+    vsnprintf(buffer, sizeof(buffer), format, args);
 
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
     va_end(args);
 
-    printf("\x1b[31m%s\x1b[0m\n", buffer);
-}
-
-// Prints terminal green text, additional arguments must be string and end with NULL. (tools.h)
-void print_grn(char *message, ...)
-{
-    va_list args;
-    va_start(args, message);
-
-    char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s", message);
-
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
-    va_end(args);
-
-    printf("\x1b[32m%s\x1b[0m\n", buffer);
-}
-
-// Prints terminal blue text, additional arguments must be string and end with NULL. (tools.h)
-void print_blu(char *message, ...)
-{
-    va_list args;
-    va_start(args, message);
-
-    char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s", message);
-
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
-    va_end(args);
-
-    printf("\x1b[34m%s\x1b[0m\n", buffer);
-}
-
-// Prints terminal yellow text, additional arguments must be string and end with NULL. (tools.h)
-void print_ylw(char *message, ...)
-{
-    va_list args;
-    va_start(args, message);
-
-    char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s", message);
-
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
-    va_end(args);
-
-    printf("\x1b[33m%s\x1b[0m\n", buffer);
-}
-
-// Prints terminal cyan text, additional arguments must be string and end with NULL. (tools.h)
-void print_cyn(char *message, ...)
-{
-    va_list args;
-    va_start(args, message);
-
-    char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s", message);
-
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
-    va_end(args);
-
-    printf("\x1b[36m%s\x1b[0m\n", buffer);
-}
-
-// Prints terminal magenta text, additional arguments must be string and end with NULL. (tools.h)
-void print_mgt(char *message, ...)
-{
-    va_list args;
-    va_start(args, message);
-
-    char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s", message);
-
-    const char *arg;
-    while ((arg = va_arg(args, const char *)) != NULL)
-    {
-        strncat(buffer, " ", sizeof(buffer) - strlen(buffer) - 1);
-        strncat(buffer, arg, sizeof(buffer) - strlen(buffer) - 1);
-    }
-    va_end(args);
-
-    printf("\x1b[35m%s\x1b[0m\n", buffer);
+    printf("%s%s\x1b[0m\n", font_color, buffer);
 }
 
 /* Prints enumerated colored lines with formatted spacing, for use with read and write menus.
@@ -291,25 +212,43 @@ void print_enum(char *color, const unsigned int number_counter, char *text)
     }
 }
 
-// Prints enumerated blue input with formatted spacing, for use with writer. (tools.h)
-void print_eninp(const unsigned int number_counter)
+/* Prints enumerated colored input with formatted spacing, for use with writer.
+color arguments include: "red", "green" and "blue". (tools.h) */
+void print_eninp(char *color, const unsigned int number_counter)
 {
-    // Print the line number and the line
-    if (number_counter < 10)
+    char font_color[10];
+    if (strcmp(color, "red") == 0)
     {
-        printf("\x1b[34m   %d:\x1b[0m ", number_counter); // 3 spaces
+        strcpy(font_color, "\x1b[31m");
     }
-    else if (number_counter < 100)
+    else if (strcmp(color, "blue") == 0)
     {
-        printf("\x1b[34m  %d:\x1b[0m ", number_counter); // 2 spaces
+        strcpy(font_color, "\x1b[34m");
     }
-    else if (number_counter < 1000)
+    else if (strcmp(color, "green") == 0)
     {
-        printf("\x1b[34m %d:\x1b[0m ", number_counter); // 1 space
+        strcpy(font_color, "\x1b[32m");
     }
     else
     {
-        printf("\x1b[34m%d:\x1b[0m ", number_counter); // no space
+        strcpy(font_color, "");
+    }
+    // Print the line number and the line
+    if (number_counter < 10)
+    {
+        printf("%s   %d:\x1b[0m ", font_color, number_counter); // 3 spaces
+    }
+    else if (number_counter < 100)
+    {
+        printf("%s  %d:\x1b[0m ", font_color, number_counter); // 2 spaces
+    }
+    else if (number_counter < 1000)
+    {
+        printf("%s %d:\x1b[0m ", font_color, number_counter); // 1 space
+    }
+    else
+    {
+        printf("%s%d:\x1b[0m ", font_color, number_counter); // no space
     }
 }
 
