@@ -6,6 +6,7 @@
 void copy_file(const char *src_filename, const char *dest_filename);
 void file_constructor(char *folder_name, char *file_name);
 int file_search(char *folder_name, char *file_name);
+char *file_index(const char *folder_path, const int index);
 void show_files(char *folder_path);
 unsigned int line_reader(const char *src_path);
 unsigned int line_reader_nonum(const char *src_path);

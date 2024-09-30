@@ -92,7 +92,7 @@ int file_search(char *folder_name, char *file_name)
     {
         while ((ent = readdir(dir)) != NULL)
         {
-            if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
+            if (strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0)
             {
                 print_enum("green", item_counter, ent->d_name);
                 if (strcmp(ent->d_name, file_name) == 0)
@@ -115,6 +115,58 @@ int file_search(char *folder_name, char *file_name)
     {
         return 0;
     }
+}
+
+// Similar to file_search but uses index instead of file name, returns folder name (actor.h)
+char *file_index(const char *folder_path, const int index)
+{
+    unsigned int item_counter = 0;
+#ifdef _WIN32
+    WIN32_FIND_DATA find_file_data;
+    HANDLE hFind = FindFirstFile(folder_path, &find_file_data);
+    if (hFind == INVALID_HANDLE_VALUE)
+    {
+        printf("Error opening directory: %s\n", folder_path);
+        return NULL;
+    }
+    do
+    {
+        if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
+        {
+            if (item_counter == index)
+            {
+                FindClose(hFind);
+                return strdup(find_file_data.cFileName); // return file name
+            }
+            item_counter++;
+        }
+    } while (FindNextFile(hFind, &find_file_data) != 0);
+    FindClose(hFind);
+#else
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(folder_path)) != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL)
+        {
+            if (strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0)
+            {
+                if (item_counter == index)
+                {
+                    closedir(dir);
+                    return strdup(ent->d_name); // return file name
+                }
+                item_counter++;
+            }
+        }
+        closedir(dir);
+    }
+    else
+    {
+        printf("Error opening directory: %s\n", folder_path);
+        return NULL;
+    }
+#endif
 }
 
 // Simply displays all file names under the folder. (actor.h)
@@ -147,7 +199,7 @@ void show_files(char *folder_path)
     {
         while ((ent = readdir(dir)) != NULL)
         {
-            if (strcmp(find_file_data.cFileName, "..") != 0 && strcmp(find_file_data.cFileName, ".") != 0)
+            if (strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0)
             {
                 print_enum("green", item_counter, ent->d_name);
                 item_counter++;

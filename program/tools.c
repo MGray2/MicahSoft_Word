@@ -128,7 +128,7 @@ void print_debug(char *file, int line, char *message, ...)
 /* Prints colored terminal text, additional arguments can be used to format variables into string.
 Color arguments include: "red", "blue", "green", "yellow", "cyan" and "magenta"
 Default color is white (tools.h) */
-void print_clr(char *color, const char *format, ...)
+void print_clr(const char *color, const char *message, ...)
 {
     char font_color[10];
     if (strcmp(color, "red") == 0)
@@ -161,10 +161,10 @@ void print_clr(char *color, const char *format, ...)
     }
 
     va_list args;
-    va_start(args, format);
+    va_start(args, message);
 
     char buffer[1024];
-    vsnprintf(buffer, sizeof(buffer), format, args);
+    vsnprintf(buffer, sizeof(buffer), message, args);
 
     va_end(args);
 
@@ -173,7 +173,7 @@ void print_clr(char *color, const char *format, ...)
 
 /* Prints enumerated colored lines with formatted spacing, for use with read and write menus.
 color arguments include: "red", "green" and "blue". (tools.h) */
-void print_enum(char *color, const unsigned int number_counter, char *text)
+void print_enum(const char *color, const unsigned int number_counter, char *message)
 {
     char font_color[10];
     if (strcmp(color, "red") == 0)
@@ -196,25 +196,25 @@ void print_enum(char *color, const unsigned int number_counter, char *text)
     // Print the line number and the line
     if (number_counter < 10)
     {
-        printf("%s   %d:\x1b[0m %s\n", font_color, number_counter, text); // 3 spaces
+        printf("%s   %d:\x1b[0m %s\n", font_color, number_counter, message); // 3 spaces
     }
     else if (number_counter < 100)
     {
-        printf("%s  %d:\x1b[0m %s\n", font_color, number_counter, text); // 2 spaces
+        printf("%s  %d:\x1b[0m %s\n", font_color, number_counter, message); // 2 spaces
     }
     else if (number_counter < 1000)
     {
-        printf("%s %d:\x1b[0m %s\n", font_color, number_counter, text); // 1 space
+        printf("%s %d:\x1b[0m %s\n", font_color, number_counter, message); // 1 space
     }
     else
     {
-        printf("%s%d:\x1b[0m %s\n", font_color, number_counter, text); // no space
+        printf("%s%d:\x1b[0m %s\n", font_color, number_counter, message); // no space
     }
 }
 
 /* Prints enumerated colored input with formatted spacing, for use with writer.
 color arguments include: "red", "green" and "blue". (tools.h) */
-void print_eninp(char *color, const unsigned int number_counter)
+void print_eninp(const char *color, const unsigned int number_counter)
 {
     char font_color[10];
     if (strcmp(color, "red") == 0)
@@ -253,24 +253,24 @@ void print_eninp(char *color, const unsigned int number_counter)
 }
 
 // Prints enumerated yellow line with formatted spacing, for use with reading directory. (tools.h)
-void print_enylw(const unsigned int number_counter, char *text)
+void print_enylw(const unsigned int number_counter, char *message)
 {
     // Print the line number and the line
     if (number_counter < 10)
     {
-        printf("\x1b[33m    !: %s\x1b[0m\n", text); // 4 spaces
+        printf("\x1b[33m    !: %s\x1b[0m\n", message); // 4 spaces
     }
     else if (number_counter < 100)
     {
-        printf("\x1b[33m   !: %s\x1b[0m\n", text); // 3 spaces
+        printf("\x1b[33m   !: %s\x1b[0m\n", message); // 3 spaces
     }
     else if (number_counter < 1000)
     {
-        printf("\x1b[33m  !: %s\x1b[0m\n", text); // 2 spaces
+        printf("\x1b[33m  !: %s\x1b[0m\n", message); // 2 spaces
     }
     else
     {
-        printf("\x1b[33m !: %s\x1b[0m\n", text); // 1 space
+        printf("\x1b[33m !: %s\x1b[0m\n", message); // 1 space
     }
 }
 
@@ -330,4 +330,26 @@ int is_file_empty(FILE *file)
     long size = ftell(file);
     rewind(file);
     return size == 0 ? 1 : 0;
+}
+
+// Evaluates a string to confirm that every character is a number and can be safely converted to int (tools.h)
+int is_integer(const char *str)
+{
+    if (*str == '-' || *str == '+') // skipping the number sign
+    {
+        str++;
+    }
+    if (!*str) // if empty
+    {
+        return 0;
+    }
+    while (*str)
+    {
+        if (!isdigit(*str)) // if at any point the string isnt a number
+        {
+            return 0;
+        }
+        *str++;
+    }
+    return 1;
 }

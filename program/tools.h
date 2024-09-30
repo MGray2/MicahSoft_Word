@@ -13,10 +13,11 @@ void ne_input(char *dest_str, int input_size);
 void pause_input(void);
 void clear_screen(void);
 int is_file_empty(FILE *file);
+int is_integer(const char *str);
 void print_debug(char *file, int line, char *message, ...);
-void print_clr(char *color, const char *format, ...);
-void print_enum(char *color, const unsigned int number_counter, char *text);
-void print_eninp(char *color, const unsigned int number_counter);
-void print_enylw(const unsigned int number_counter, char *text);
+void print_clr(const char *color, const char *message, ...);
+void print_enum(const char *color, const unsigned int number_counter, char *message);
+void print_eninp(const char *color, const unsigned int number_counter);
+void print_enylw(const unsigned int number_counter, char *message);
 
 #endif

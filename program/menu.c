@@ -61,7 +61,7 @@ int title_selection(void)
 char *new_file_screen(void)
 {
     char file_name[100];
-    char folder_path[100];
+    char folder_path[200];
     clear_screen();
     printf("\x1b[46m              New File              \x1b[0m\n");
     clear_input_buffer();
@@ -119,7 +119,7 @@ char *new_file_screen(void)
 char *file_find_screen(void)
 {
     char file_name[100];
-    char folder_path[100];
+    char folder_path[200];
     clear_screen();
     clear_input_buffer();
     printf("\x1b[46m             Locate File              \x1b[0m\n");
@@ -132,11 +132,17 @@ char *file_find_screen(void)
 #endif
 
     show_files(folder_path);
-    printf("File name: ");
+    printf("File name or index number: ");
     ne_input(file_name, sizeof(file_name));
 
     clear_screen();
     printf("\x1b[46m             Locate File              \x1b[0m\n");
+    if (is_integer(file_name)) // int -> str
+    {
+        int file_int = atoi(file_name);
+        file_int--; // 0 based indexing
+        strcpy(file_name, file_index(folder_path, file_int));
+    }
     if (file_search(folder_path, file_name))
     {
         remove_asterisk(folder_path);
