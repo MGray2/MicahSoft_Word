@@ -272,6 +272,7 @@ void write_miniscreen(char *source_file)
 {
     FILE *file;
     char response[1024] = "";
+    Str_array arr;
     clear_input_buffer();
 
     while (1)
@@ -279,30 +280,73 @@ void write_miniscreen(char *source_file)
         clear_screen();
         print_clr("cyan", "Write mode");
         printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /remove  /undo  /shift  /quit \x1b[0m\n");
+
         unsigned int line_counter = line_reader(source_file);
+        unsigned int line_target;
+        int status;
+        char new_text[1024] = "";
+        init_str_array(&arr, 2);
+
         file = fopen(source_file, line_counter == 0 ? "w" : "a");
         if (line_counter == 0)
         {
             line_counter = 1;
         }
         print_eninp("blue", line_counter);
-        fgets(response, sizeof(response), stdin);
-        if (strcmp(response, "/quit\n") == 0)
+        fgets(response, sizeof(response), stdin); // Write prompt
+        if (*response == '/')
         {
-            fclose(file);
-            break;
-        }
-        else if (strcmp(response, "/replace\n") == 0)
-        {
-            unsigned int line_target;
-            char new_text[1024];
-            Str_array arr;
-            init_str_array(&arr, 2);
-            read_file_to_array(source_file, &arr);
-            while (1)
+            remove_newline(response);
+            switch (command_detector(response))
             {
-                printf("Replace at line: \x1b[34m");
-                int status = scanf("%d", &line_target);
+            case 0: // None
+                continue;
+            case 1: // Quit
+                fclose(file);
+                return;
+            case 2: // Replace
+                read_file_to_array(source_file, &arr);
+                while (1)
+                {
+                    printf("Replace at line: \x1b[34m");
+                    status = scanf("%d", &line_target);
+                    clear_input_buffer();
+                    printf("\x1b[0m");
+                    if (line_target < 0 && line_target > arr.size)
+                        continue;
+                    if (status == 1)
+                    {
+                        line_target--; // 0 based index
+                        // The replace prompt
+                        print_enum("red", line_target, arr.array[line_target]);
+                        print_eninp("green", line_target);
+
+                        fgets(new_text, sizeof(new_text), stdin);
+                        remove_newline(new_text);
+                        replace_line(&arr, line_target, new_text);
+                        write_array_to_file(source_file, &arr);
+                        free_str_array(&arr);
+                        break;
+                    }
+                }
+                continue;
+            case 3: // Clear
+                if (confirmation("Are you sure you want to clear all text in this file? Y/N"))
+                {
+                    fclose(file);
+                    FILE *c_file = fopen(source_file, "w");
+                    fclose(c_file);
+                }
+                continue;
+            case 4: // Undo
+                read_file_to_array(source_file, &arr);
+                remove_last_line(&arr);
+                write_array_to_file(source_file, &arr);
+                free_str_array(&arr);
+                continue;
+            case 5: // Shift
+                printf("Shift at line: \x1b[34m");
+                status = scanf("%d", &line_target);
                 clear_input_buffer();
                 printf("\x1b[0m");
                 if (line_target < 0)
@@ -311,90 +355,32 @@ void write_miniscreen(char *source_file)
                 }
                 if (status == 1)
                 {
-                    // The replace prompt
-                    print_enum("red", line_target, arr.array[line_target - 1]);
-                    print_eninp("green", line_target);
-
-                    line_target--; // 0 based index
-                    fgets(new_text, sizeof(new_text), stdin);
-                    remove_newline(new_text);
-                    replace_line(&arr, line_target, new_text);
+                    line_target--;
+                    read_file_to_array(source_file, &arr);
+                    insert_string_at(&arr, line_target, "");
                     write_array_to_file(source_file, &arr);
                     free_str_array(&arr);
-                    break;
                 }
-            }
-            continue;
-        }
-        else if (strcmp(response, "/clear\n") == 0)
-        {
-            if (confirmation("Are you sure you want to clear all text in this file? Y/N"))
-            {
-                fclose(file);
-                FILE *c_file = fopen(source_file, "w");
-                fclose(c_file);
-            }
-            continue;
-        }
-        else if (strcmp(response, "/undo\n") == 0)
-        {
-            Str_array arr;
-            init_str_array(&arr, 2);
-            read_file_to_array(source_file, &arr);
-            remove_last_line(&arr);
-            write_array_to_file(source_file, &arr);
-            free_str_array(&arr);
-            continue;
-        }
-        else if (strcmp(response, "/shift\n") == 0)
-        {
-            unsigned int line_target;
-            printf("Shift at line: \x1b[34m");
-            int status = scanf("%d", &line_target);
-            clear_input_buffer();
-            printf("\x1b[0m");
-            if (line_target < 0)
-            {
+                continue;
+            case 6: // Remove
+                printf("Remove at line: \x1b[34m");
+                status = scanf("%d", &line_target);
+                clear_input_buffer();
+                printf("\x1b[0m");
+                if (line_target < 0)
+                {
+                    continue;
+                }
+                if (status == 1)
+                {
+                    line_target--;
+                    read_file_to_array(source_file, &arr);
+                    remove_string_at(&arr, line_target);
+                    write_array_to_file(source_file, &arr);
+                    free_str_array(&arr);
+                }
                 continue;
             }
-            if (status == 1)
-            {
-                line_target--;
-                Str_array arr;
-                init_str_array(&arr, 2);
-                read_file_to_array(source_file, &arr);
-                insert_string_at(&arr, line_target, "");
-                write_array_to_file(source_file, &arr);
-                free_str_array(&arr);
-            }
-            continue;
-        }
-        else if (strcmp(response, "/remove\n") == 0)
-        {
-            unsigned int line_target;
-            printf("Remove at line: \x1b[34m");
-            int status = scanf("%d", &line_target);
-            clear_input_buffer();
-            printf("\x1b[0m");
-            if (line_target < 0)
-            {
-                continue;
-            }
-            if (status == 1)
-            {
-                line_target--;
-                Str_array arr;
-                init_str_array(&arr, 2);
-                read_file_to_array(source_file, &arr);
-                remove_string_at(&arr, line_target);
-                write_array_to_file(source_file, &arr);
-                free_str_array(&arr);
-            }
-            continue;
-        }
-        else if (response[0] == '/')
-        {
-            continue;
         }
         fwrite(response, 1, strlen(response), file);
         line_counter++;

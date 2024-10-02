@@ -353,3 +353,31 @@ int is_integer(const char *str)
     }
     return 1;
 }
+
+/*
+Interprets strings that follow command formatting and returns a number depending on command type.
+0 = none
+1 = quit
+2 = replace
+3 = clear
+4 = undo
+5 = shift
+6 = remove
+*/
+int command_detector(char *str)
+{
+    if (strcmp(str, "/quit") == 0)
+        return 1;
+    else if (strcmp(str, "/replace") == 0)
+        return 2;
+    else if (strcmp(str, "/clear") == 0)
+        return 3;
+    else if (strcmp(str, "/undo") == 0)
+        return 4;
+    else if (strcmp(str, "/shift") == 0)
+        return 5;
+    else if (strcmp(str, "/remove") == 0)
+        return 6;
+    else
+        return 0;
+}

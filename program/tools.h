@@ -19,5 +19,6 @@ void print_clr(const char *color, const char *message, ...);
 void print_enum(const char *color, const unsigned int number_counter, char *message);
 void print_eninp(const char *color, const unsigned int number_counter);
 void print_enylw(const unsigned int number_counter, char *message);
+int command_detector(char *str);
 
 #endif
