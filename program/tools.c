@@ -366,18 +366,73 @@ Interprets strings that follow command formatting and returns a number depending
 */
 int command_detector(char *str)
 {
-    if (strcmp(str, "/quit") == 0)
+    if (strncmp(str, "/quit", 5) == 0)
         return 1;
-    else if (strcmp(str, "/replace") == 0)
+    else if (strncmp(str, "/replace", 8) == 0)
         return 2;
-    else if (strcmp(str, "/clear") == 0)
+    else if (strncmp(str, "/clear", 6) == 0)
         return 3;
-    else if (strcmp(str, "/undo") == 0)
+    else if (strncmp(str, "/undo", 5) == 0)
         return 4;
-    else if (strcmp(str, "/shift") == 0)
+    else if (strncmp(str, "/shift", 6) == 0)
         return 5;
-    else if (strcmp(str, "/remove") == 0)
+    else if (strncmp(str, "/remove", 7) == 0)
         return 6;
     else
         return 0;
+}
+
+/* Collects numbers from a string and returns an array of int.
+&count argument must equal 0 and will be updated after function call (tools.h) */
+int *number_extractor(char *str, int *count)
+{
+    int *numbers = NULL; // dynamic array
+    int capacity = 0;    // capacity of the numbers array
+    *count = 0;          // initialize count to 0
+
+    while (*str)
+    {
+        // skip non-number characters
+        if (!isdigit(*str) && *str != '-' && *str != '+')
+        {
+            str++;
+            continue;
+        }
+
+        char buffer[20]; // buffer to hold number string
+        int i = 0;
+
+        if (*str == '-' || *str == '+')
+        {
+            buffer[i++] = *str++;
+        }
+        while (isdigit(*str))
+        {
+            buffer[i++] = *str++;
+        }
+        buffer[i] = '\0'; // null-terminate the buffer
+
+        if (i > 0) // if numbers
+        {
+            int num = atoi(buffer); // str -> int
+
+            // Resize the array if needed
+            if (*count >= capacity)
+            {
+                capacity = (capacity == 0) ? 1 : capacity * 2;
+                int *temp = realloc(numbers, capacity * sizeof(int));
+
+                if (temp == NULL)
+                {
+                    free(numbers); // free previously allocated memory
+                    return NULL;   // failure
+                }
+                numbers = temp; // update numbers to the new memory
+            }
+
+            numbers[*count] = num; // store the number
+            (*count)++;
+        }
+    }
+    return numbers;
 }

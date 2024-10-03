@@ -20,5 +20,6 @@ void print_enum(const char *color, const unsigned int number_counter, char *mess
 void print_eninp(const char *color, const unsigned int number_counter);
 void print_enylw(const unsigned int number_counter, char *message);
 int command_detector(char *str);
+int *number_extractor(char *str, int *count);
 
 #endif
