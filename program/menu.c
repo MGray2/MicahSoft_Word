@@ -279,10 +279,10 @@ void write_miniscreen(char *source_file)
     {
         clear_screen();
         print_clr("cyan", "Write mode");
-        printf("\x1b[3m\x1b[30m\x1b[46mAvailable commands: /clear  /replace  /remove  /undo  /shift  /quit \x1b[0m\n");
 
         unsigned int line_counter = line_reader(source_file);
         unsigned int line_target;
+        unsigned int line_target_2;
         int status;
         char new_text[1024] = "";
         int count = 0;
@@ -365,6 +365,53 @@ void write_miniscreen(char *source_file)
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
                 continue;
+            case 7: // Copy
+                num_args = number_extractor(response, &count);
+                line_target = *num_args;
+                *num_args++;
+                line_target_2 = *num_args;
+                if (line_target < 0 && line_target > arr.size && line_target_2 < 0 && line_target_2 > arr.size)
+                    continue;
+
+                line_target--;
+                line_target_2--;
+                init_str_array(&arr, 2);
+                read_file_to_array(source_file, &arr);
+                strcpy(new_text, arr.array[line_target]);
+                replace_line(&arr, line_target_2, new_text);
+                write_array_to_file(source_file, &arr);
+                free_str_array(&arr);
+                continue;
+            case 8: // Cut
+                num_args = number_extractor(response, &count);
+                line_target = *num_args;
+                *num_args++;
+                line_target_2 = *num_args;
+                if (line_target < 0 && line_target > arr.size && line_target_2 < 0 && line_target_2 > arr.size)
+                    continue;
+
+                line_target--;
+                line_target_2--;
+                init_str_array(&arr, 2);
+                read_file_to_array(source_file, &arr);
+                strcpy(new_text, arr.array[line_target]);
+                replace_line(&arr, line_target_2, new_text);
+                remove_string_at(&arr, line_target);
+                write_array_to_file(source_file, &arr);
+                free_str_array(&arr);
+                continue;
+            case 9: // Help
+                printf("\n/quit - exit write mode");
+                printf("\n/replace <line #> - replaces selected line with new text.");
+                printf("\n/clear - clears entire file.");
+                printf("\n/undo - removes recent line, does not actually undo actions.");
+                printf("\n/shift <line #> - creates a new line above target line.");
+                printf("\n/remove <line #> - removes target line and shifts following lines up.");
+                printf("\n/copy <A #> <B #> - copies line A to line B. ");
+                printf("\n/cut <A #> <B #> - copies line A to line B, line A is removed.");
+                print_clr("blue", "\nPress enter to continue.");
+                pause_input();
+                continue;
             }
         }
         fwrite(response, 1, strlen(response), file);
@@ -417,6 +464,7 @@ void file_write_screen(char *file_path)
             print_clr("yellow", "This file is empty.");
         }
         print_clr("blue", "\nPress enter to continue.");
+        clear_input_buffer();
         pause_input();
         file_write_screen(file_path); // return
         break;

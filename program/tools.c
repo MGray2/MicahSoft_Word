@@ -319,8 +319,8 @@ void ne_input(char *dest_str, int input_size)
 // Halts the program until 'enter' is pressed. (tools.h)
 void pause_input(void)
 {
-    clear_input_buffer();
-    clear_input_buffer();
+    char input[2] = "";
+    fgets(input, sizeof(input), stdin);
 }
 
 // Returns true if file is empty, false otherwise. Calls 'rewind()' on file. (tools.h)
@@ -363,6 +363,9 @@ Interprets strings that follow command formatting and returns a number depending
 4 = undo
 5 = shift
 6 = remove
+7 = copy
+8 = cut
+9 = help
 */
 int command_detector(char *str)
 {
@@ -378,6 +381,12 @@ int command_detector(char *str)
         return 5;
     else if (strncmp(str, "/remove", 7) == 0)
         return 6;
+    else if (strncmp(str, "/copy", 5) == 0)
+        return 7;
+    else if (strncmp(str, "/cut", 4) == 0)
+        return 8;
+    else if (strncmp(str, "/help", 5) == 0)
+        return 9;
     else
         return 0;
 }
