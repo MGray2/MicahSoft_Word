@@ -116,7 +116,7 @@ void print_debug(char *file, int line, char *message, ...)
     va_start(args, message);
 
     char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "***DEBUG*** (%s ln:%d) %s", file, line, message);
+    snprintf(buffer, sizeof(buffer), "***DEBUG*** (%s ln:%d) ", file, line);
 
     vsnprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), message, args);
 
@@ -398,7 +398,6 @@ int *number_extractor(char *str, int *count)
     int *numbers = NULL; // dynamic array
     int capacity = 0;    // capacity of the numbers array
     *count = 0;          // initialize count to 0
-
     while (*str)
     {
         // skip non-number characters
@@ -438,7 +437,6 @@ int *number_extractor(char *str, int *count)
                 }
                 numbers = temp; // update numbers to the new memory
             }
-
             numbers[*count] = num; // store the number
             (*count)++;
         }

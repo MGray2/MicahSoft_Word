@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "menu.h"
 #include "tools.h"
 #include "actor.h"
@@ -281,8 +282,8 @@ void write_miniscreen(char *source_file)
         print_clr("cyan", "Write mode");
 
         unsigned int line_counter = line_reader(source_file);
-        unsigned int line_target;
-        unsigned int line_target_2;
+        unsigned int line_target = UINT_MAX;
+        unsigned int line_target_2 = UINT_MAX;
         int status;
         char new_text[1024] = "";
         int count = 0;
@@ -305,11 +306,15 @@ void write_miniscreen(char *source_file)
             case 1: // Quit
                 fclose(file);
                 return;
-            case 2: // Replace
+            case 2: // Replace (1 arg)
+                if (strcmp(response, "/replace") == 0)
+                    continue;
                 init_str_array(&arr, 2);
                 read_file_to_array(source_file, &arr);
                 num_args = number_extractor(response, &count);
                 line_target = *num_args;
+                if (count < 1)
+                    continue;
                 if (line_target < 0 && line_target > arr.size)
                     continue;
 
@@ -339,9 +344,13 @@ void write_miniscreen(char *source_file)
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
                 continue;
-            case 5: // Shift
+            case 5: // Shift (1 arg)
+                if (strcmp(response, "/shift") == 0)
+                    continue;
                 num_args = number_extractor(response, &count);
                 line_target = *num_args;
+                if (count < 1)
+                    continue;
                 if (line_target < 0 && line_target > arr.size)
                     continue;
 
@@ -352,9 +361,13 @@ void write_miniscreen(char *source_file)
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
                 continue;
-            case 6: // Remove
+            case 6: // Remove (1 arg)
+                if (strcmp(response, "/remove") == 0)
+                    continue;
                 num_args = number_extractor(response, &count);
                 line_target = *num_args;
+                if (count < 1)
+                    continue;
                 if (line_target < 0 && line_target > arr.size)
                     continue;
 
@@ -365,11 +378,15 @@ void write_miniscreen(char *source_file)
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
                 continue;
-            case 7: // Copy
+            case 7: // Copy (2 args)
+                if (strcmp(response, "/copy") == 0)
+                    continue;
                 num_args = number_extractor(response, &count);
                 line_target = *num_args;
                 *num_args++;
                 line_target_2 = *num_args;
+                if (count < 2)
+                    continue;
                 if (line_target < 0 && line_target > arr.size && line_target_2 < 0 && line_target_2 > arr.size)
                     continue;
 
@@ -382,11 +399,15 @@ void write_miniscreen(char *source_file)
                 write_array_to_file(source_file, &arr);
                 free_str_array(&arr);
                 continue;
-            case 8: // Cut
+            case 8: // Cut (2 args)
+                if (strcmp(response, "/cut") == 0)
+                    continue;
                 num_args = number_extractor(response, &count);
                 line_target = *num_args;
                 *num_args++;
                 line_target_2 = *num_args;
+                if (count < 2)
+                    continue;
                 if (line_target < 0 && line_target > arr.size && line_target_2 < 0 && line_target_2 > arr.size)
                     continue;
 
@@ -509,6 +530,7 @@ void information_screen()
         print_clr("cyan", "Read Mode");
         line_reader(info_path);
         print_clr("cyan", "\nPress enter to continue.");
+        pause_input();
         pause_input();
     }
     else

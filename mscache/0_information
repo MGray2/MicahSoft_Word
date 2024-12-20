@@ -1,0 +1,44 @@
+Welcome to MicahSoft Word! This is a solo project I made to help me understand the c programming language.
+More information can be found in the readme file, in this document I will write about this program's functionality.
+
+All of your files created by this program will be located in the folder called "mscache".
+This folder will regenerate should it be deleted.
+You can only interact with files inside of the mscache folder.
+
+Compared to the original MicahSoft Word, in this version, when you create files the program will check if the
+file name is taken and ask you if you want to rename them. The program will also ask if you want to try again
+if it could not find the file you were looking for.
+
+Deleting and copying files now happen in the file writting screen instead of the title screen.
+You may not be able to delete a file after it was just created, simply re-run the program, its an OS issue.
+The program will evaluate the contents of the file you are working on to determine if it should be opened in
+write mode or append mode.
+Unlike the original MicahSoft Word, this program will read the file for you as you write and in read mode.
+
+In write mode you will have commands to modify your writing, these commands start with a slash "/" symbol
+followed by the command name. Some commands accept number arguments which should be space separated after the command.
+
+"/clear" will completely clear all content in the file, a confirmation message will give you one last chance
+to reconsider.
+
+"/undo" will remove the last line of the file, the undo command will not work on replaced lines and should only
+be used to remove lines.
+
+"/quit" will exit the writing menu.
+
+"/replace <number>" requires a line number (colored blue for your convinience) to select a line to replace.
+You will get a prompt with a red index representing the old text and a green index representing the new text.
+
+"/shift <number>" creates an empty line above the targeted line shifting following lines downward.
+You can use the /replace command to modify the shifted line.
+
+"/remove <number>" works like the oppositee of shift, it will destroy a specified line and move following lines up.
+Note that /undo will not revert the changes caused by /remove.
+
+"/copy <number A> <number B>" copies the line at the first argument (A) into the line in the second argument (B).
+
+"/cut <number A> <number B>" works like /copy except the line at A will be removed afterwards.
+
+"/help" will give you a brief description of all other commands.
+
+This page was written using MicahSoft Word!

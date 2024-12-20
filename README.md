@@ -10,6 +10,8 @@
 
 > The project is now complete as of 6/24/24. MicahSoft Word C edition is a major improvement compared to the original.
 
+> Big update 12/20/24. Reorganized project into program folder, added new commands to writer and command arguements are all on the same line. You can access writer projects with number indexes now.
+
 ### Changes
 
 ---
@@ -26,13 +28,10 @@ More details of the program is explained in the information file.
 
 ## Installation
 
-> Once you clone this project, you may need to compile the program if you cannot used the already compiled _msword.exe_ object. I have used both clang and gcc during development of MicahSoft Word.
+> Once you clone this project, you may need to compile the program if you cannot use the already compiled _msword.exe_ object. I used gcc 6.3.0 during development of MicahSoft Word.
 
 > To compile with gcc use this command:
-> `gcc -o msword main.c include/actor.c include/menu.c include/tools.c`
-
-> For clang it should be:
-> `clang -o msword main.c include/actor.c include/menu.c include/tools.c`
+> `gcc program/*.c -o msword`
 
 > The "msword" after the -o argument can be whatever you want to name the program, but for this example when the compiled object is created you simply need to navigate to the project folder and type in `./msword.exe` or `./msword` to run the project
 
